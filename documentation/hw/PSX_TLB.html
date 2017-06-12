@@ -1,0 +1,1903 @@
+<!DOCTYPE html>
+<html id="XenForo" lang="en-US" dir="LTR" class="Public LoggedOut Sidebar  Responsive" xmlns:fb="http://www.facebook.com/2008/fbml">
+<head>
+
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+	
+	
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	
+		<base href="http://ngemu.com/" />
+		<script type="text/javascript" src="http://gc.kis.scr.kaspersky-labs.com/259413CC-86C5-8341-BF22-11C4796F65B5/main.js" charset="UTF-8"></script><script>
+			var _b = document.getElementsByTagName('base')[0], _bH = "http://ngemu.com/";
+			if (_b && _b.href != _bH) _b.href = _bH;
+		</script>
+	
+
+	<title>Memory management in PSX | NGEmu</title>
+	
+	<noscript><style>.JsOnly { display: none !important; }</style></noscript>
+	<link rel="stylesheet" href="css.php?css=xenforo,form,public&amp;style=2&amp;dir=LTR&amp;d=1478886162" />
+	<link rel="stylesheet" href="css.php?css=bb_code,bbcm_js,facebook,login_bar,message,message_user_info,share_page,thread_view&amp;style=2&amp;dir=LTR&amp;d=1478886162" />
+	
+	
+
+	
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>	
+	
+		<script>if (!window.jQuery) { document.write('<scr'+'ipt type="text/javascript" src="js/jquery/jquery-1.10.2.min.js"><\/scr'+'ipt>'); }</script>
+		
+	<script src="js/xenforo/xenforo.js?_v=a3b17423"></script>
+
+
+
+<script type="text/javascript">
+netseer_tag_id="27427"; 
+netseer_publisher_label="ngemu.com";
+</script>
+<script async src="//ps.ns-cdn.com/dsatserving2/scripts/ns_vmtag.js" type="text/javascript"></script>
+
+	
+	<link rel="apple-touch-icon" href="http://ngemu.com/styles/default/xenforo/logo.og.png" />
+	<link rel="alternate" type="application/rss+xml" title="RSS feed for NGEmu" href="forums/-/index.rss" />
+	
+	
+	<link rel="canonical" href="http://ngemu.com/threads/memory-management-in-psx.42360/" />
+	<meta name="description" content="Hello!
+
+I am writing a general purpose emulator for MIPS R3000A platforms and started writing a PSX emulator with it to show what it's features. But the..." />
+	<meta property="og:site_name" content="NGEmu" />
+	<meta property="og:image" content="http://ngemu.com/styles/default/xenforo/avatars/avatar_m.png" />
+	<meta property="og:image" content="http://ngemu.com/styles/default/xenforo/logo.og.png" />
+	<meta property="og:type" content="article" />
+	<meta property="og:url" content="http://ngemu.com/threads/memory-management-in-psx.42360/" />
+	<meta property="og:title" content="Memory management in PSX" />
+	
+	<meta property="fb:app_id" content="1430755973803378" />
+	
+
+
+        <!-- twitter app card start-->
+        <!-- https://dev.twitter.com/docs/cards/types/app-card -->
+        <meta name="twitter:card" content="app" />
+    
+        <meta name="twitter:app:id:iphone" content="307880732" />
+        <meta name="twitter:app:url:iphone" content="tapatalk://ngemu.com?location=topic&tid=42360" />
+        <meta name="twitter:app:id:ipad" content="307880732">
+        <meta name="twitter:app:url:ipad" content="tapatalk://ngemu.com?location=topic&tid=42360" />
+        
+        <meta name="twitter:app:id:googleplay" content="com.quoord.tapatalkpro.activity" />
+        <meta name="twitter:app:url:googleplay" content="tapatalk://ngemu.com?location=topic&tid=42360" />
+        
+    <!-- twitter app card -->
+    
+    <!-- Tapatalk Banner head start -->
+    <link href="http://ngemu.com/mobiquo/smartbanner/appbanner.css" rel="stylesheet" type="text/css" media="screen" />
+    <script type="text/javascript">
+        var is_mobile_skin     = 0;
+        var app_ios_id         = "";
+        var app_android_id     = "";
+        var app_kindle_url     = "";
+        var app_banner_message = "";
+        var app_forum_name     = "NGEmu";
+        var app_location_url   = "tapatalk://ngemu.com?location=topic&tid=42360";
+        var app_board_url      = "http%3A%2F%2Fngemu.com";
+        var functionCallAfterWindowLoad = 0
+    </script>
+    <script src="http://ngemu.com/mobiquo/smartbanner/appbanner.js" type="text/javascript"></script>
+    <!-- Tapatalk Banner head end-->
+<meta name="google-site-verification" content="cN4yGWq4Ji0Im5E5tTe5DkNzNPc1liVKRpAIBi1ngyo" />
+<script src="http://api.solvemedia.com/papi/challenge.ajax"></script>
+	
+	<script type="text/javascript" src="js/kingk/bbcm/bbcodes.js"></script>
+
+
+
+
+<!-- Amazon Tag Top -->
+<script type='text/javascript' src='//c.amazon-adsystem.com/aax2/amzn_ads.js'></script>
+<script type='text/javascript'>
+    try {
+            amznads.getAds('3274');
+        } catch (e) { /*ignore*/ }
+</script>
+<!-- /Amazon Tag Top -->
+
+<!-- DFP TAG -->
+<script type='text/javascript'>
+var googletag = googletag || {};
+googletag.cmd = googletag.cmd || [];
+(function() {
+var gads = document.createElement('script');
+gads.async = true;
+gads.type = 'text/javascript';
+var useSSL = 'https:' == document.location.protocol;
+gads.src = (useSSL ? 'https:' : 'http:') + '//www.googletagservices.com/tag/js/gpt.js';
+var node = document.getElementsByTagName('script')[0];
+node.parentNode.insertBefore(gads, node);})();
+</script>
+<script id='dfpsetup' type='text/javascript'>
+googletag.cmd.push(function() {
+googletag.defineSlot('/1030735/NGEmu_com_728x90_Top_TECH_Forum', [728, 90], 'NGEmu_com_728x90_Top_TECH_Forum').addService(googletag.pubads());
+googletag.defineSlot('/1030735/NGEmu_com_728x90_Bottom_TECH_Forum', [728, 90], 'NGEmu_com_728x90_Bottom_TECH_Forum').addService(googletag.pubads());
+googletag.defineSlot('/1030735/NGEmu_com_300x250_TopRight_TECH_Forum', [300, 250], 'NGEmu_com_300x250_TopRight_TECH_Forum').addService(googletag.pubads());
+googletag.defineSlot('/1030735/NGEmu_com_300x250_TopLeft_TECH_Forum', [300, 250], 'NGEmu_com_300x250_TopLeft_TECH_Forum').addService(googletag.pubads());
+googletag.defineSlot('/1030735/NGEmu_com_300x250_Postbit_TECH_Forum', [300, 250], 'NGEmu_com_300x250_Postbit_TECH_Forum').addService(googletag.pubads());
+
+googletag.pubads().setTargeting("sitename", "ngemu.com");
+
+googletag.pubads().setTargeting("registered", "false");
+
+
+
+googletag.pubads().setTargeting("forumid", "11");
+googletag.pubads().enableSingleRequest();
+googletag.enableServices();
+});
+googletag.cmd.push(function() {
+googletag.pubads().set("adsense_background_color", "FFFFFF");
+googletag.pubads().set("adsense_border_color", "FFFFFF");
+googletag.pubads().set("adsense_link_color", "233953");
+googletag.pubads().set("adsense_text_color", "233953");
+googletag.pubads().set("adsense_url_color", "233953");
+googletag.pubads().set("google_ad_bg", "FFFFFF");
+googletag.pubads().set("google_ad_border", "FFFFFF");
+googletag.pubads().set("google_ad_link", "233953");
+googletag.pubads().set("google_ad_text", "233953");
+googletag.pubads().set("google_ad_url", "233953");
+googletag.pubads().set("page_url", "http://www.ngemu.com");});
+</script>
+<!-- /DFP TAG -->
+
+<!-- Amazon Tag Bottom -->
+<script type='text/javascript'>
+  var googletag = googletag || {};
+  googletag.cmd = googletag.cmd || [];
+  try { amznads.setTargetingForGPTAsync('passback'); } catch(e) { /*ignore*/}
+</script>
+<!-- /Amazon Tag Bottom -->
+
+
+
+</head>
+
+<body class="node11 node4">
+
+
+
+<!-- Tapatalk Detect body start -->
+<style type="text/css">
+.ui-mobile [data-role="page"], .ui-mobile [data-role="dialog"], .ui-page 
+{
+top:auto;
+}
+</style>
+<script type="text/javascript">tapatalkDetect()</script>
+<!-- Tapatalk Detect banner body end -->
+                
+
+
+
+	
+
+<div id="loginBar">
+	<div class="pageWidth">
+		<div class="pageContent">	
+			<h3 id="loginBarHandle">
+				<label for="LoginControl"><a href="login/" class="concealed noOutline">Log in or Sign up</a></label>
+			</h3>
+			
+			<span class="helper"></span>
+
+			
+		</div>
+	</div>
+</div>
+
+
+<div id="headerMover">
+	<div id="headerProxy"></div>
+
+<div id="content" class="thread_view">
+	<div class="pageWidth">
+		<div class="pageContent">
+			<!-- main content area -->
+			
+			
+			
+			
+				<div class="mainContainer">
+					<div class="mainContent">
+						
+						
+						<div align="center" style="padding:12px 0px 0px 0px;">
+					<div id="NGEmu_com_728x90_Top_TECH_Forum" style="width: 728px; height: 90px;">
+						<script type="text/javascript">
+							googletag.cmd.push(function() { googletag.display("NGEmu_com_728x90_Top_TECH_Forum"); });
+						</script>
+					</div>
+					</div>
+						
+						
+						
+						<div class="breadBoxTop ">
+							
+							
+
+<nav>
+	
+		
+			
+				
+			
+		
+			
+				
+			
+		
+	
+
+	<fieldset class="breadcrumb">
+		<a href="misc/quick-navigation-menu?selected=node-11" class="OverlayTrigger jumpMenuTrigger" data-cacheOverlay="true" title="Open quick navigation"><!--Jump to...--></a>
+			
+		<div class="boardTitle"><strong>NGEmu</strong></div>
+		
+		<span class="crumbs">
+			
+				<span class="crust homeCrumb" itemscope="itemscope" itemtype="http://data-vocabulary.org/Breadcrumb">
+					<a href="http://ngemu.com" class="crumb" rel="up" itemprop="url"><span itemprop="title">Home</span></a>
+					<span class="arrow"><span></span></span>
+				</span>
+			
+			
+			
+				<span class="crust selectedTabCrumb" itemscope="itemscope" itemtype="http://data-vocabulary.org/Breadcrumb">
+					<a href="http://ngemu.com/" class="crumb" rel="up" itemprop="url"><span itemprop="title">Forums</span></a>
+					<span class="arrow"><span>&gt;</span></span>
+				</span>
+			
+			
+			
+				
+					<span class="crust" itemscope="itemscope" itemtype="http://data-vocabulary.org/Breadcrumb">
+						<a href="http://ngemu.com/.#psx-emulation.4" class="crumb" rel="up" itemprop="url"><span itemprop="title">PSX Emulation</span></a>
+						<span class="arrow"><span>&gt;</span></span>
+					</span>
+				
+					<span class="crust" itemscope="itemscope" itemtype="http://data-vocabulary.org/Breadcrumb">
+						<a href="http://ngemu.com/forums/misc-psx-discussion.11/" class="crumb" rel="up" itemprop="url"><span itemprop="title">Misc PSX Discussion</span></a>
+						<span class="arrow"><span>&gt;</span></span>
+					</span>
+				
+			
+		</span>
+	</fieldset>
+</nav>
+						</div>
+						
+						
+						
+					
+						<!--[if lt IE 8]>
+							<p class="importantMessage">You are using an out of date browser. It  may not display this or other websites correctly.<br />You should upgrade or use an <a href="https://www.google.com/chrome" target="_blank">alternative browser</a>.</p>
+						<![endif]-->
+
+						
+												
+						
+						
+						
+												
+							<!-- h1 title, description -->
+							<div class="titleBar">
+								
+								<h1>Memory management in PSX</h1>
+								
+								<p id="pageDescription" class="muted ">
+	Discussion in '<a href="forums/misc-psx-discussion.11/">Misc PSX Discussion</a>' started by <a href="members/vision_thing.25358/" class="username">Vision_Thing</a>, <a href="threads/memory-management-in-psx.42360/"><span class="DateTime" title="Sep 17, 2003 at 11:42 AM">Sep 17, 2003</span></a>.
+</p>
+							</div>
+						
+						
+						
+						
+						
+						<!-- main template -->
+						
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+<div class="pageNavLinkGroup">
+	<div class="linkGroup SelectionCountContainer">
+		
+		
+	</div>
+
+	
+</div>
+
+
+
+
+
+
+<form action="inline-mod/post/switch" method="post"
+	class="InlineModForm section"
+	data-cookieName="posts"
+	data-controls="#InlineModControls"
+	data-imodOptions="#ModerationSelect option">
+
+	<ol class="messageList" id="messageList">
+		
+			
+				
+
+
+<li id="post-603813" class="message   " data-author="Vision_Thing">
+
+	
+
+<div class="messageUserInfo" itemscope="itemscope" itemtype="http://data-vocabulary.org/Person">	
+<div class="messageUserBlock">
+	
+		<div class="avatarHolder">
+			<span class="helper"></span>
+			<a href="members/vision_thing.25358/" class="avatar Av25358m" data-avatarhtml="true"><img src="styles/default/xenforo/avatars/avatar_m.png" width="96" height="96" alt="Vision_Thing" /></a>
+			<!-- slot: message_user_info_avatar -->
+		</div>
+	
+
+
+	
+		<h3 class="userText">
+			<a href="members/vision_thing.25358/" class="username" itemprop="name">Vision_Thing</a>
+			<em class="userTitle" itemprop="title">New Member</em>
+			
+			<!-- slot: message_user_info_text -->
+		</h3>
+	
+		
+	
+		<div class="extraUserInfo">
+			
+			
+				
+				
+				
+					<dl class="pairsJustified">
+						<dt>Messages:</dt>
+						<dd><a href="search/member?user_id=25358" class="concealed" rel="nofollow">2</a></dd>
+					</dl>
+				
+				
+				
+					<dl class="pairsJustified">
+						<dt>Likes Received:</dt>
+						<dd>0</dd>
+					</dl>
+				
+				
+				
+			
+				
+				
+				
+				
+				
+			
+				
+							
+						
+			
+			
+		</div>
+	
+		
+
+
+	<span class="arrow"><span></span></span>
+</div>
+</div>
+
+	<div class="messageInfo primaryContent">
+		
+		
+		
+		
+		
+		<div class="messageContent">		
+			<article>
+				<blockquote class="messageText ugc baseHtml">
+					
+					Hello!<br />
+<br />
+I am writing a general purpose emulator for MIPS R3000A platforms and started writing a PSX emulator with it to show what it&#039;s features. But the memory organization of the PSX just doesn&#039;t add up... <br />
+<br />
+<a href="http://www.futureworlds.it/~quequero/psx/tute/faq.html" target="_blank" class="externalLink" rel="nofollow">http://www.futureworlds.it/~quequero/psx/tute/faq.html</a> says &quot;The CPU for this console is a modified r3000 (see <a href="http://www.sgi.com" target="_blank" class="externalLink" rel="nofollow">www.sgi.com</a> and <a href="http://www.idt.com" target="_blank" class="externalLink" rel="nofollow">www.idt.com</a> for more details) which runs at 33Mhz, it has a stripped down MMU which (among other things) means that the memory addresses are hard wired: the logical addresses 0x00xxxxxx, 0xA0xxxxxx, 0x80xxxxxx all point to the same physical memory (the difference lies in caching etc.).&quot;. <br />
+Does this mean that the TLB is *bypassed* for kuseg addresses (msb 000), and handled similarly to kseg0 and kseg1 (ie no pageing and address ANDed with 0x1FFFFFFF)? <br />
+<br />
+Also, how are kseg2 accesses (msb 11) handled; are they paged etc? I tried to boot from the PSX boot ROM and there is an access to 0xFFFE0130... Now, there doesn&#039;t seem to be any I/O-mapped device at that location and the address is out of range to be a physical access (even when 3 msbs removed), so the only solutions I can see are either pageing (for kseg2), or wrapping around. But the exception vector in the boot ROM doesn&#039;t contain any meaningful code for filling the TLB so I suppose these addresses aren&#039;t paged either... or? <br />
+<br />
+Thanks in advance for answers, <br />
+Tommi
+				</blockquote>
+			</article>
+			
+			
+		</div>
+		
+		
+		
+		
+		
+		
+		
+				
+		<div class="messageMeta ToggleTriggerAnchor">
+			
+			<div class="privateControls">
+				
+				<span class="item muted">
+					<span class="authorEnd"><a href="members/vision_thing.25358/" class="username author">Vision_Thing</a>,</span>
+					<a href="threads/memory-management-in-psx.42360/" title="Permalink" class="datePermalink"><span class="DateTime" title="Sep 17, 2003 at 11:42 AM">Sep 17, 2003</span></a>
+				</span>
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			<div class="publicControls">
+				<a href="threads/memory-management-in-psx.42360/" title="Permalink" class="item muted postNumber hashPermalink OverlayTrigger" data-href="posts/603813/permalink">#1</a>
+				
+				
+				
+				
+			</div>
+		</div>
+	
+		
+		<div id="likes-post-603813"></div>
+	</div>
+
+	
+	
+	
+
+
+
+	
+	 
+						
+					
+    <li class="message">
+
+        <div class="messageUserInfo">
+            <div class="messageUserBlock">
+                
+
+                <h3 class="userText">
+                    NGEmu.com
+                    <em class="userTitle" itemprop="title">Advertisement</em>
+                </h3>
+
+                <span class="arrow"><span></span></span>
+            </div>
+        </div>
+
+        <div class="messageInfo primaryContent">
+            <div class="messageContent">
+                <blockquote class="messageText ugc baseHtml">
+                  <div id="NGEmu_com_300x250_Postbit_TECH_Forum" style="width: 300px; height: 250px;">
+						<script type="text/javascript">
+							googletag.cmd.push(function() { googletag.display("NGEmu_com_300x250_Postbit_TECH_Forum"); });
+						</script>
+					</div>		
+                </blockquote>
+            </div>
+        </div>
+    </li>
+
+	
+</li>
+			
+		
+			
+				
+
+
+<li id="post-604231" class="message   " data-author="zenogais">
+
+	
+
+<div class="messageUserInfo" itemscope="itemscope" itemtype="http://data-vocabulary.org/Person">	
+<div class="messageUserBlock">
+	
+		<div class="avatarHolder">
+			<span class="helper"></span>
+			<a href="members/zenogais.23923/" class="avatar Av23923m" data-avatarhtml="true"><img src="data/avatars/m/23/23923.jpg?1383152797" width="96" height="96" alt="zenogais" /></a>
+			<!-- slot: message_user_info_avatar -->
+		</div>
+	
+
+
+	
+		<h3 class="userText">
+			<a href="members/zenogais.23923/" class="username" itemprop="name">zenogais</a>
+			<em class="userTitle" itemprop="title">Emu author</em>
+			
+			<!-- slot: message_user_info_text -->
+		</h3>
+	
+		
+	
+		<div class="extraUserInfo">
+			
+			
+				
+				
+				
+					<dl class="pairsJustified">
+						<dt>Messages:</dt>
+						<dd><a href="search/member?user_id=23923" class="concealed" rel="nofollow">839</a></dd>
+					</dl>
+				
+				
+				
+					<dl class="pairsJustified">
+						<dt>Likes Received:</dt>
+						<dd>0</dd>
+					</dl>
+				
+				
+				
+			
+				
+				
+				
+				
+				
+			
+				
+							
+						
+			
+			
+		</div>
+	
+		
+
+
+	<span class="arrow"><span></span></span>
+</div>
+</div>
+
+	<div class="messageInfo primaryContent">
+		
+		
+		
+		
+		
+		<div class="messageContent">		
+			<article>
+				<blockquote class="messageText ugc baseHtml">
+					
+					<div class="bbCodeBlock bbCodeQuote" data-author="Vision_Thing">
+	<aside>
+		
+			<div class="attribution type">Vision_Thing said:
+				
+			</div>
+		
+		<blockquote class="quoteContainer"><div class="quote">Hello!<br />
+<br />
+I am writing a general purpose emulator for MIPS R3000A platforms and started writing a PSX emulator with it to show what it&#039;s features. But the memory organization of the PSX just doesn&#039;t add up... <br />
+<br />
+<a href="http://www.futureworlds.it/~quequero/psx/tute/faq.html" target="_blank" class="externalLink" rel="nofollow">http://www.futureworlds.it/~quequero/psx/tute/faq.html</a> says &quot;The CPU for this console is a modified r3000 (see <a href="http://www.sgi.com" target="_blank" class="externalLink" rel="nofollow">www.sgi.com</a> and <a href="http://www.idt.com" target="_blank" class="externalLink" rel="nofollow">www.idt.com</a> for more details) which runs at 33Mhz, it has a stripped down MMU which (among other things) means that the memory addresses are hard wired: the logical addresses 0x00xxxxxx, 0xA0xxxxxx, 0x80xxxxxx all point to the same physical memory (the difference lies in caching etc.).&quot;. <br />
+Does this mean that the TLB is *bypassed* for kuseg addresses (msb 000), and handled similarly to kseg0 and kseg1 (ie no pageing and address ANDed with 0x1FFFFFFF)? <br />
+<br />
+Also, how are kseg2 accesses (msb 11) handled; are they paged etc? I tried to boot from the PSX boot ROM and there is an access to 0xFFFE0130... Now, there doesn&#039;t seem to be any I/O-mapped device at that location and the address is out of range to be a physical access (even when 3 msbs removed), so the only solutions I can see are either pageing (for kseg2), or wrapping around. But the exception vector in the boot ROM doesn&#039;t contain any meaningful code for filling the TLB so I suppose these addresses aren&#039;t paged either... or? <br />
+<br />
+Thanks in advance for answers, <br />
+Tommi</div><div class="quoteExpand">Click to expand...</div></blockquote>
+	</aside>
+</div>The PSX uses the virutal memory technique and thats why those locations all point to same memory addresses.  Also I don&#039;t know why there would be an access to 0xFFFE0130.  Here&#039;s some links to some helpful sites that might be worth a read:<br />
+<br />
+<a href="http://psx.rules.org/psxrul2.shtml" target="_blank" class="externalLink" rel="nofollow">http://psx.rules.org/psxrul2.shtml</a><br />
+<a href="http://www.runix.ru/html/Documentation%20kit/" target="_blank" class="externalLink" rel="nofollow">http://www.runix.ru/html/Documentation kit/</a><br />
+<a href="http://www.zophar.net/tech/psx.html" target="_blank" class="externalLink" rel="nofollow">PSX Documentation Project</a><br />
+<br />
+Hope this helps, If you find the answer your looking for please post it in this topic because I would love to find out as well.
+				</blockquote>
+			</article>
+			
+			
+		</div>
+		
+		
+		
+		
+		
+		
+		
+				
+		<div class="messageMeta ToggleTriggerAnchor">
+			
+			<div class="privateControls">
+				
+				<span class="item muted">
+					<span class="authorEnd"><a href="members/zenogais.23923/" class="username author">zenogais</a>,</span>
+					<a href="threads/memory-management-in-psx.42360/#post-604231" title="Permalink" class="datePermalink"><span class="DateTime" title="Sep 17, 2003 at 9:06 PM">Sep 17, 2003</span></a>
+				</span>
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			<div class="publicControls">
+				<a href="threads/memory-management-in-psx.42360/#post-604231" title="Permalink" class="item muted postNumber hashPermalink OverlayTrigger" data-href="posts/604231/permalink">#2</a>
+				
+				
+				
+				
+			</div>
+		</div>
+	
+		
+		<div id="likes-post-604231"></div>
+	</div>
+
+	
+	
+	
+
+
+
+	
+	 
+						
+					
+	
+</li>
+			
+		
+			
+				
+
+
+<li id="post-755055" class="message   " data-author="zenogais">
+
+	
+
+<div class="messageUserInfo" itemscope="itemscope" itemtype="http://data-vocabulary.org/Person">	
+<div class="messageUserBlock">
+	
+		<div class="avatarHolder">
+			<span class="helper"></span>
+			<a href="members/zenogais.23923/" class="avatar Av23923m" data-avatarhtml="true"><img src="data/avatars/m/23/23923.jpg?1383152797" width="96" height="96" alt="zenogais" /></a>
+			<!-- slot: message_user_info_avatar -->
+		</div>
+	
+
+
+	
+		<h3 class="userText">
+			<a href="members/zenogais.23923/" class="username" itemprop="name">zenogais</a>
+			<em class="userTitle" itemprop="title">Emu author</em>
+			
+			<!-- slot: message_user_info_text -->
+		</h3>
+	
+		
+	
+		<div class="extraUserInfo">
+			
+			
+				
+				
+				
+					<dl class="pairsJustified">
+						<dt>Messages:</dt>
+						<dd><a href="search/member?user_id=23923" class="concealed" rel="nofollow">839</a></dd>
+					</dl>
+				
+				
+				
+					<dl class="pairsJustified">
+						<dt>Likes Received:</dt>
+						<dd>0</dd>
+					</dl>
+				
+				
+				
+			
+				
+				
+				
+				
+				
+			
+				
+							
+						
+			
+			
+		</div>
+	
+		
+
+
+	<span class="arrow"><span></span></span>
+</div>
+</div>
+
+	<div class="messageInfo primaryContent">
+		
+		
+		
+		
+		
+		<div class="messageContent">		
+			<article>
+				<blockquote class="messageText ugc baseHtml">
+					
+					Firstly, I&#039;d like to apologize for bringing up a dead topic, but I just wanted to answer the question thorougly this time around.  Firstly, the playstation as you probably already know has two coprocessors cop0 and cop2, cop1 would have been an FPU but none was included with any version of the PSX.  Now the &quot;System Control CoProcessor&quot; or cop1, is used to handle memory reads/writes through a system known as virtual memory, meaning that the original 2 MBs of RAM are mirrored twice from kuseg over kseg0 and kseg1.  The difference between the two segments is that kseg0 is cached, while kseg1 is not.<br />
+<br />
+Now the virtual memory caching and access is managed through a &quot;Translation Lookaside Buffer&quot; or TLB.  The TLB is used to translate the virtual address into their physical equivalent and to throw a &quot;TLB Miss&quot; exception when an invalid memory space access is attempted, now virtual memory access are handled using a &quot;Virtual Page Number&quot; or VPN.  The 3 most-significant bits (MSB) of the page number indicate which virtual page the user is attempting to write to, the three MSBs are as follows:<br />
+<br />
+<ul>
+<li>kuseg - MSB: 0xx  [in decimal form that would be 0-3] <b>Actual RAM</b></li>
+<li>kseg0 - MSB: 100  [in decimal form that would be 4]    <b>paged RAM <i>cached</i></b></li>
+<li>kseg1 - MSB: 101  [in decimal form that would be 5]    <b>paged RAM <i>uncached</i></b></li>
+</ul><br />
+Now I&#039;m not sure whether or not the TLB is bypassed for calls outside of paged memory, but according to Xeven (author of PSXeven) in another thread the Playstation contains &quot;a stripped MMU&quot;, meaning that the TLB may not even be used by the Playstation at all.  Now I still haven&#039;t managed to verify this information, but if thats true then the only reason for CoProcessor0 to still be around would be for exception handling purposes.  Its funny now though, because Xeven used a similar example to the one you gave above stating than an access to an obviously invalid address such as 0xFFFE0130 has a very specific purpose, such as cache flusing, which would make perfect sense in the context for which you described.  At the startup of the Playstation the caches are in a random state thus meaning that any attempt to read cached data would have unpredictable results, thus whatever bootup code is being loaded most certainly would need to flush all the caches it needed to use , Probably the Instruction Cache and the Data Cache.  Now according to the official MIPS R30xx family doc ( <a href="http://decstation.unix-ag.org/docs/ic_docs/3467.pdf" target="_blank" class="externalLink" rel="nofollow">http://decstation.unix-ag.org/docs/ic_docs/3467.pdf</a> ), the caches would first need to be isolated, and then systematically flushed.  This is probably what that bit of code does, and that MIPS document should help you alot.  Hopefully I&#039;ve finally answered your question.<br />
+<br />
+EDIT: Look further into it you&#039;ll find that 0xFFFE0130 falls into the kseg2 memory space.  This is the area of memory that can only be accessed while in kernel mode.  This memory commonly contains resources such as page tables and the like.  Well I&#039;m not sure this is true for the Playstations R3K cpu, it would appear to be so.
+				</blockquote>
+			</article>
+			
+			
+		</div>
+		
+		
+		
+			<div class="editDate">
+			
+				Last edited: <span class="DateTime" title="Aug 6, 2004 at 12:04 AM">Aug 6, 2004</span>
+			
+			</div>
+		
+		
+		
+		
+		
+				
+		<div class="messageMeta ToggleTriggerAnchor">
+			
+			<div class="privateControls">
+				
+				<span class="item muted">
+					<span class="authorEnd"><a href="members/zenogais.23923/" class="username author">zenogais</a>,</span>
+					<a href="threads/memory-management-in-psx.42360/#post-755055" title="Permalink" class="datePermalink"><span class="DateTime" title="Jul 13, 2004 at 11:02 AM">Jul 13, 2004</span></a>
+				</span>
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			<div class="publicControls">
+				<a href="threads/memory-management-in-psx.42360/#post-755055" title="Permalink" class="item muted postNumber hashPermalink OverlayTrigger" data-href="posts/755055/permalink">#3</a>
+				
+				
+				
+				
+			</div>
+		</div>
+	
+		
+		<div id="likes-post-755055"></div>
+	</div>
+
+	
+	
+	
+
+
+
+	
+	 
+						
+					
+	
+</li>
+			
+		
+			
+				
+
+
+<li id="post-756285" class="message   " data-author="André Ventura">
+
+	
+
+<div class="messageUserInfo" itemscope="itemscope" itemtype="http://data-vocabulary.org/Person">	
+<div class="messageUserBlock">
+	
+		<div class="avatarHolder">
+			<span class="helper"></span>
+			<a href="members/andr%C3%A9-ventura.28558/" class="avatar Av28558m" data-avatarhtml="true"><img src="styles/default/xenforo/avatars/avatar_m.png" width="96" height="96" alt="André Ventura" /></a>
+			<!-- slot: message_user_info_avatar -->
+		</div>
+	
+
+
+	
+		<h3 class="userText">
+			<a href="members/andr%C3%A9-ventura.28558/" class="username" itemprop="name">André Ventura</a>
+			<em class="userTitle" itemprop="title">New Member</em>
+			
+			<!-- slot: message_user_info_text -->
+		</h3>
+	
+		
+	
+		<div class="extraUserInfo">
+			
+			
+				
+				
+				
+					<dl class="pairsJustified">
+						<dt>Messages:</dt>
+						<dd><a href="search/member?user_id=28558" class="concealed" rel="nofollow">7</a></dd>
+					</dl>
+				
+				
+				
+					<dl class="pairsJustified">
+						<dt>Likes Received:</dt>
+						<dd>0</dd>
+					</dl>
+				
+				
+				
+			
+				
+				
+				
+				
+				
+			
+				
+							
+						
+			
+			
+		</div>
+	
+		
+
+
+	<span class="arrow"><span></span></span>
+</div>
+</div>
+
+	<div class="messageInfo primaryContent">
+		
+		
+		
+		
+		
+		<div class="messageContent">		
+			<article>
+				<blockquote class="messageText ugc baseHtml">
+					
+					I think that the CPU is derived from a base version of the MIPS architecture.<br />
+So, it don&#039;t have a TLB.<br />
+<br />
+It seems to use an direct mapped memory, where the main memory is divided by 65356 sizes sub-segments, for all main segments KUSEG, KSEG0 and 1.<br />
+<br />
+The ROM is sub-segmented too, but i miss the sizes of them.<br />
+<br />
+Its seems to be not so simple, like in the native MIPS base versions.
+				</blockquote>
+			</article>
+			
+			
+		</div>
+		
+		
+		
+		
+		
+		
+		
+				
+		<div class="messageMeta ToggleTriggerAnchor">
+			
+			<div class="privateControls">
+				
+				<span class="item muted">
+					<span class="authorEnd"><a href="members/andr%C3%A9-ventura.28558/" class="username author">André Ventura</a>,</span>
+					<a href="threads/memory-management-in-psx.42360/#post-756285" title="Permalink" class="datePermalink"><span class="DateTime" title="Jul 15, 2004 at 7:49 PM">Jul 15, 2004</span></a>
+				</span>
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			<div class="publicControls">
+				<a href="threads/memory-management-in-psx.42360/#post-756285" title="Permalink" class="item muted postNumber hashPermalink OverlayTrigger" data-href="posts/756285/permalink">#4</a>
+				
+				
+				
+				
+			</div>
+		</div>
+	
+		
+		<div id="likes-post-756285"></div>
+	</div>
+
+	
+	
+	
+
+
+
+	
+	 
+						
+					
+	
+</li>
+			
+		
+			
+				
+
+
+<li id="post-756345" class="message   " data-author="zenogais">
+
+	
+
+<div class="messageUserInfo" itemscope="itemscope" itemtype="http://data-vocabulary.org/Person">	
+<div class="messageUserBlock">
+	
+		<div class="avatarHolder">
+			<span class="helper"></span>
+			<a href="members/zenogais.23923/" class="avatar Av23923m" data-avatarhtml="true"><img src="data/avatars/m/23/23923.jpg?1383152797" width="96" height="96" alt="zenogais" /></a>
+			<!-- slot: message_user_info_avatar -->
+		</div>
+	
+
+
+	
+		<h3 class="userText">
+			<a href="members/zenogais.23923/" class="username" itemprop="name">zenogais</a>
+			<em class="userTitle" itemprop="title">Emu author</em>
+			
+			<!-- slot: message_user_info_text -->
+		</h3>
+	
+		
+	
+		<div class="extraUserInfo">
+			
+			
+				
+				
+				
+					<dl class="pairsJustified">
+						<dt>Messages:</dt>
+						<dd><a href="search/member?user_id=23923" class="concealed" rel="nofollow">839</a></dd>
+					</dl>
+				
+				
+				
+					<dl class="pairsJustified">
+						<dt>Likes Received:</dt>
+						<dd>0</dd>
+					</dl>
+				
+				
+				
+			
+				
+				
+				
+				
+				
+			
+				
+							
+						
+			
+			
+		</div>
+	
+		
+
+
+	<span class="arrow"><span></span></span>
+</div>
+</div>
+
+	<div class="messageInfo primaryContent">
+		
+		
+		
+		
+		
+		<div class="messageContent">		
+			<article>
+				<blockquote class="messageText ugc baseHtml">
+					
+					<div class="bbCodeBlock bbCodeQuote" data-author="André Ventura">
+	<aside>
+		
+			<div class="attribution type">André Ventura said:
+				
+			</div>
+		
+		<blockquote class="quoteContainer"><div class="quote">I think that the CPU is derived from a base version of the MIPS architecture.<br />
+So, it don&#039;t have a TLB.<br />
+<br />
+It seems to use an direct mapped memory, where the main memory is divided by 65356 sizes sub-segments, for all main segments KUSEG, KSEG0 and 1.<br />
+<br />
+The ROM is sub-segmented too, but i miss the sizes of them.<br />
+<br />
+Its seems to be not so simple, like in the native MIPS base versions.</div><div class="quoteExpand">Click to expand...</div></blockquote>
+	</aside>
+</div>You&#039;re correct in assuming that it is a &quot;base version&quot; of the MIPS R30xx Architecture.  You&#039;re also correct in assuming that it doesn&#039;t have a TLB.  Basically the PSX uses the R3000A CPU with, as Xeven stated, a &quot;stripped MMU&quot;.  The only instruction from the CoProcessor0 that appears to be executable is the Return From Exception(RFE) instruction.  Meaning that the MMU of the PSX is designed only to handle exceptional conditions and nothing more.
+				</blockquote>
+			</article>
+			
+			
+		</div>
+		
+		
+		
+		
+		
+		
+		
+				
+		<div class="messageMeta ToggleTriggerAnchor">
+			
+			<div class="privateControls">
+				
+				<span class="item muted">
+					<span class="authorEnd"><a href="members/zenogais.23923/" class="username author">zenogais</a>,</span>
+					<a href="threads/memory-management-in-psx.42360/#post-756345" title="Permalink" class="datePermalink"><span class="DateTime" title="Jul 16, 2004 at 12:08 AM">Jul 16, 2004</span></a>
+				</span>
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+			
+			<div class="publicControls">
+				<a href="threads/memory-management-in-psx.42360/#post-756345" title="Permalink" class="item muted postNumber hashPermalink OverlayTrigger" data-href="posts/756345/permalink">#5</a>
+				
+				
+				
+				
+			</div>
+		</div>
+	
+		
+		<div id="likes-post-756345"></div>
+	</div>
+
+	
+	
+	
+
+
+
+	
+	 
+						
+					
+	
+</li>
+			
+		
+		
+	</ol>
+
+	
+
+	<input type="hidden" name="_xfToken" value="" />
+
+</form>
+
+
+	<div class="pageNavLinkGroup">
+		
+			
+				<div class="linkGroup">
+					
+						<label for="LoginControl"><a href="login/" class="concealed element">(You must log in or sign up to reply here.)</a></label>
+					
+				</div>
+			
+			<div class="linkGroup" style="display: none"><a href="javascript:" class="muted jsOnly DisplayIgnoredContent Tooltip" title="Show hidden content by ">Show Ignored Content</a></div>
+
+			
+		
+	</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+	
+
+	<div class="sharePage">
+		<h3 class="textHeading larger">Share This Page</h3>
+		
+			
+			
+				<div class="tweet shareControl">
+					<a href="https://twitter.com/share" class="twitter-share-button"
+						data-count="horizontal"
+						data-lang="en"
+						data-url="http://ngemu.com/threads/memory-management-in-psx.42360/"
+						data-text="Memory management in PSX"
+						
+						>Tweet</a>
+				</div>
+			
+			
+			
+				<div class="facebookLike shareControl">
+					
+					<fb:like href="http://ngemu.com/threads/memory-management-in-psx.42360/" show_faces="true" width="400" action="like" font="trebuchet ms" colorscheme="dark"></fb:like>
+				</div>
+			
+			
+		
+	</div>
+
+						
+						
+						<center>
+						
+<div id="NGEmu_com_728x90_Bottom_TECH_Forum" style="width: 728px; height: 90px;">
+						<script type="text/javascript">
+							googletag.cmd.push(function() { googletag.display("NGEmu_com_728x90_Bottom_TECH_Forum"); });
+						</script>
+					</div>
+					
+</center>
+						
+						
+						
+							<!-- login form, to be moved to the upper drop-down -->
+							
+
+
+
+
+
+<form action="login/login" method="post" class="xenForm eAuth" id="login" style="display:none">
+
+	
+		<ul id="eAuthUnit">
+			
+				
+				
+					
+					<li><a href="register/facebook?reg=1" class="fbLogin" tabindex="110"><span>Login with Facebook</span></a></li>
+				
+				
+			
+		</ul>
+	
+
+	<div class="ctrlWrapper">
+		<dl class="ctrlUnit">
+			<dt><label for="LoginControl">Your name or email address:</label></dt>
+			<dd><input type="text" name="login" id="LoginControl" class="textCtrl" tabindex="101" /></dd>
+		</dl>
+	
+	
+		<dl class="ctrlUnit">
+			<dt>
+				<label for="ctrl_password">Do you already have an account?</label>
+			</dt>
+			<dd>
+				<ul>
+					<li><label for="ctrl_not_registered"><input type="radio" name="register" value="1" id="ctrl_not_registered" tabindex="105" />
+						No, create an account now.</label></li>
+					<li><label for="ctrl_registered"><input type="radio" name="register" value="0" id="ctrl_registered" tabindex="105" checked="checked" class="Disabler" />
+						Yes, my password is:</label></li>
+					<li id="ctrl_registered_Disabler">
+						<input type="password" name="password" class="textCtrl" id="ctrl_password" tabindex="102" />
+						<div class="lostPassword"><a href="lost-password/" class="OverlayTrigger OverlayCloser" tabindex="106">Forgot your password?</a></div>
+					</li>
+				</ul>
+			</dd>
+		</dl>
+	
+		
+		<dl class="ctrlUnit submitUnit">
+			<dt></dt>
+			<dd>
+				<input type="submit" class="button primary" value="Log in" tabindex="104" data-loginPhrase="Log in" data-signupPhrase="Sign Up" />
+				<label for="ctrl_remember" class="rememberPassword"><input type="checkbox" name="remember" value="1" id="ctrl_remember" tabindex="103" /> Stay logged in</label>
+			</dd>
+		</dl>
+	</div>
+
+	<input type="hidden" name="cookie_check" value="1" />
+	<input type="hidden" name="redirect" value="/threads/memory-management-in-psx.42360/" />
+	<input type="hidden" name="_xfToken" value="" />
+
+</form>
+						
+						
+					</div>
+				</div>
+				
+				<!-- sidebar -->
+				<aside>
+					<div class="sidebar">
+						
+						
+						
+
+<div class="section loginButton">		
+	<div class="secondaryContent">
+		<label for="LoginControl" id="SignupButton"><a href="login/" class="inner">Sign Up Now!</a></label>
+	</div>
+</div>
+
+
+
+
+
+
+
+
+
+
+						<div id="NGEmu_com_300x250_TopRight_TECH_Forum" style="width: 300px; height: 250px;">
+						<script type="text/javascript">
+							googletag.cmd.push(function() { googletag.display("NGEmu_com_300x250_TopRight_TECH_Forum"); });
+						</script>
+					</div>
+						
+						
+						
+						
+					</div>
+				</aside>
+			
+			
+						
+			<div class="breadBoxBottom">
+
+<nav>
+	
+
+	<fieldset class="breadcrumb">
+		<a href="misc/quick-navigation-menu?selected=node-11" class="OverlayTrigger jumpMenuTrigger" data-cacheOverlay="true" title="Open quick navigation"><!--Jump to...--></a>
+			
+		<div class="boardTitle"><strong>NGEmu</strong></div>
+		
+		<span class="crumbs">
+			
+				<span class="crust homeCrumb">
+					<a href="http://ngemu.com" class="crumb"><span>Home</span></a>
+					<span class="arrow"><span></span></span>
+				</span>
+			
+			
+			
+				<span class="crust selectedTabCrumb">
+					<a href="http://ngemu.com/" class="crumb"><span>Forums</span></a>
+					<span class="arrow"><span>&gt;</span></span>
+				</span>
+			
+			
+			
+				
+					<span class="crust">
+						<a href="http://ngemu.com/.#psx-emulation.4" class="crumb"><span>PSX Emulation</span></a>
+						<span class="arrow"><span>&gt;</span></span>
+					</span>
+				
+					<span class="crust">
+						<a href="http://ngemu.com/forums/misc-psx-discussion.11/" class="crumb"><span>Misc PSX Discussion</span></a>
+						<span class="arrow"><span>&gt;</span></span>
+					</span>
+				
+			
+		</span>
+	</fieldset>
+</nav></div>
+			
+						
+			
+			
+			
+						
+		</div>
+	</div>
+</div>
+
+<header>
+	
+<div id="header">
+	<div id="logoBlock">
+	<div class="pageWidth">
+		<div class="pageContent">
+			
+			
+			<div id="logo"><a href="http://ngemu.com">
+				<span></span>
+				<img src="http://www.ngemu.com/images/logo.png" alt="NGEmu" />
+			</a></div>
+			
+			<span class="helper"></span>
+		</div>
+	</div>
+</div>
+	
+
+<div id="navigation" class="pageWidth withSearch">
+	<div class="pageContent">
+		<nav>
+
+<div class="navTabs">
+	<ul class="publicTabs">
+	
+		<!-- home -->
+		
+			<li class="navTab home PopupClosed"><a href="http://ngemu.com" class="navLink">Home</a></li>
+		
+		
+		
+		<!-- extra tabs: home -->
+		
+		
+		
+		<!-- forums -->
+		
+			<li class="navTab forums selected">
+			
+				<a href="http://ngemu.com/" class="navLink">Forums</a>
+				<a href="http://ngemu.com/" class="SplitCtrl" rel="Menu"></a>
+				
+				<div class="tabLinks forumsTabLinks">
+					<div class="primaryContent menuHeader">
+						<h3>Forums</h3>
+						<div class="muted">Quick Links</div>
+					</div>
+					<ul class="secondaryContent blockLinksList">
+					
+						
+						<li><a href="search/?type=post">Search Forums</a></li>
+						
+						<li><a href="find-new/posts" rel="nofollow">Recent Posts</a></li>
+					
+					</ul>
+				</div>
+			</li>
+		
+		
+		
+		<!-- extra tabs: middle -->
+		
+		
+			
+				<li class="navTab resources Popup PopupControl PopupClosed">
+			
+				<a href="http://ngemu.com/resources/" class="navLink">Resources</a>
+				<a href="http://ngemu.com/resources/" class="SplitCtrl" rel="Menu"></a>
+				
+				<div class="Menu JsOnly tabMenu resourcesTabLinks">
+					<div class="primaryContent menuHeader">
+						<h3>Resources</h3>
+						<div class="muted">Quick Links</div>
+					</div>
+					<ul class="secondaryContent blockLinksList">
+	<li><a href="search/?type=resource_update">Search Resources</a></li>
+	<li><a href="resources/authors">Most Active Authors</a></li>
+	
+	
+</ul>
+				</div>
+			</li>
+			
+		
+		
+		
+		
+		<!-- members -->
+		
+			<li class="navTab members Popup PopupControl PopupClosed">
+			
+				<a href="http://ngemu.com/members/" class="navLink">Members</a>
+				<a href="http://ngemu.com/members/" class="SplitCtrl" rel="Menu"></a>
+				
+				<div class="Menu JsOnly tabMenu membersTabLinks">
+					<div class="primaryContent menuHeader">
+						<h3>Members</h3>
+						<div class="muted">Quick Links</div>
+					</div>
+					<ul class="secondaryContent blockLinksList">
+					
+						<li><a href="members/">Notable Members</a></li>
+						
+						<li><a href="online/">Current Visitors</a></li>
+						<li><a href="recent-activity/">Recent Activity</a></li>
+					
+					</ul>
+				</div>
+			</li>
+						
+		
+		<!-- extra tabs: end -->
+		
+
+		<!-- responsive popup -->
+		<li class="navTab navigationHiddenTabs Popup PopupControl PopupClosed" style="display:none">	
+						
+			<a rel="Menu" class="navLink NoPopupGadget"><span class="menuIcon">Menu</span></a>
+			
+			<div class="Menu JsOnly blockLinksList primaryContent" id="NavigationHiddenMenu"></div>
+		</li>
+			
+		
+		<!-- no selection -->
+		
+		
+	</ul>
+	
+	
+</div>
+
+<span class="helper"></span>
+			
+		</nav>	
+	</div>
+</div>
+	
+
+<div id="searchBar" class="pageWidth">
+	
+	<span id="QuickSearchPlaceholder" title="Search">Search</span>
+	<fieldset id="QuickSearch">
+		<form action="search/search" method="post" class="formPopup">
+			
+			<div class="primaryControls">
+				<!-- block: primaryControls -->
+				<input type="search" name="keywords" value="" class="textCtrl" placeholder="Search..." results="0" title="Enter your search and hit enter" id="QuickSearchQuery" />				
+				<!-- end block: primaryControls -->
+			</div>
+			
+			<div class="secondaryControls">
+				<div class="controlsWrapper">
+				
+					<!-- block: secondaryControls -->
+					<dl class="ctrlUnit">
+						<dt></dt>
+						<dd><ul>
+							<li><label><input type="checkbox" name="title_only" value="1"
+								id="search_bar_title_only" class="AutoChecker"
+								data-uncheck="#search_bar_thread" /> Search titles only</label></li>
+						</ul></dd>
+					</dl>
+				
+					<dl class="ctrlUnit">
+						<dt><label for="searchBar_users">Posted by Member:</label></dt>
+						<dd>
+							<input type="text" name="users" value="" class="textCtrl AutoComplete" id="searchBar_users" />
+							<p class="explain">Separate names with a comma.</p>
+						</dd>
+					</dl>
+				
+					<dl class="ctrlUnit">
+						<dt><label for="searchBar_date">Newer Than:</label></dt>
+						<dd><input type="date" name="date" value="" class="textCtrl" id="searchBar_date" /></dd>
+					</dl>
+					
+					
+					<dl class="ctrlUnit">
+						<dt></dt>
+						<dd><ul>
+								
+									<li><label title="Search only Memory management in PSX"><input type="checkbox" name="type[post][thread_id]" value="42360"
+	id="search_bar_thread" class="AutoChecker"
+	data-uncheck="#search_bar_title_only, #search_bar_nodes" /> Search this thread only</label></li>
+								
+									<li><label title="Search only Misc PSX Discussion"><input type="checkbox" name="nodes[]" value="11"
+	id="search_bar_nodes" class="Disabler AutoChecker" checked="checked"
+	data-uncheck="#search_bar_thread" /> Search this forum only</label>
+	<ul id="search_bar_nodes_Disabler">
+		<li><label><input type="checkbox" name="type[post][group_discussion]" value="1"
+			id="search_bar_group_discussion" class="AutoChecker"
+			data-uncheck="#search_bar_thread" /> Display results as threads</label></li>
+	</ul></li>
+								
+						</ul></dd>
+					</dl>
+					
+				</div>
+				<!-- end block: secondaryControls -->
+				
+				<dl class="ctrlUnit submitUnit">
+					<dt></dt>
+					<dd>
+						<input type="submit" value="Search" class="button primary Tooltip" title="Find Now" />
+						<div class="Popup" id="commonSearches">
+							<a rel="Menu" class="button NoPopupGadget Tooltip" title="Useful Searches" data-tipclass="flipped"><span class="arrowWidget"></span></a>
+							<div class="Menu">
+								<div class="primaryContent menuHeader">
+									<h3>Useful Searches</h3>
+								</div>
+								<ul class="secondaryContent blockLinksList">
+									<!-- block: useful_searches -->
+									<li><a href="find-new/posts?recent=1" rel="nofollow">Recent Posts</a></li>
+									
+									<!-- end block: useful_searches -->
+								</ul>
+							</div>
+						</div>
+						<a href="search/" class="button moreOptions Tooltip" title="Advanced search">More...</a>
+					</dd>
+				</dl>
+				
+			</div>
+			
+			<input type="hidden" name="_xfToken" value="" />
+		</form>		
+	</fieldset>
+	
+</div>
+</div>
+
+	
+	
+</header>
+
+</div>
+
+<footer>
+	
+
+
+<div class="footer">
+	<div class="pageWidth">
+		<div class="pageContent">
+			
+			<dl class="choosers">
+				
+					<dt>Style</dt>
+					<dd><a href="misc/style?redirect=%2Fthreads%2Fmemory-management-in-psx.42360%2F" class="OverlayTrigger Tooltip" title="Style Chooser" rel="nofollow">NGEmu v0.1</a></dd>
+				
+				
+			</dl>
+			
+			
+			<ul class="footerLinks">
+			
+				
+					<li><a href="misc/contact" class="OverlayTrigger" data-overlayOptions="{&quot;fixed&quot;:false}">Contact Us</a></li>
+				
+				<li><a href="help/">Help</a></li>
+				<li><a href="http://ngemu.com" class="homeLink">Home</a></li>
+				<li><a href="/threads/memory-management-in-psx.42360/#navigation" class="topLink">Top</a></li>
+				<li><a href="forums/-/index.rss" rel="alternate" class="globalFeed" target="_blank"
+					title="RSS feed for NGEmu">RSS</a></li>
+			
+			</ul>
+			
+			<span class="helper"></span>
+		</div>
+	</div>
+</div>
+
+<div class="footerLegal">
+	<div class="pageWidth">
+		<div class="pageContent">
+			<ul id="legal">
+			
+				<li><a href="http://www.verticalscope.com/terms-of-use.html">Terms and Rules</a></li>
+				<li><a href="http://www.verticalscope.com/privacy-statement.html">Privacy Policy</a></li>
+			
+			</ul>
+			
+			<div id="copyright"></div>
+			
+		
+			
+			
+			<span class="helper"></span>
+		</div>
+	</div>	
+</div>
+<script type="text/javascript">
+(function () {
+var wid = 'WS-93EAC';
+
+function async_load() { var s = document.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src = 'http://services.webspectator.com/init/' + wid + '/' +(+new Date); var x = document.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s, x); }
+if (window.attachEvent) { window.attachEvent('onload', async_load); }
+else { window.addEventListener('load', async_load, false); }0
+})();
+</script>
+
+
+
+
+
+<!-- ConsolidatedFooters Footers -->
+
+<table cellpadding="3" cellspacing="0" border="0" class="page" align="center" width="100%"><tr><td class="tfoot" align="center" width="100%"><div class="smallfont"><strong><a href="http://www.verticalscope.com/aboutus/tos.php?site=ngemu.com">Terms of Use</a></strong></div></td></tr></table>
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-23759764-18']);
+  _gaq.push(['_setDomainName', '.ngemu.com']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+<script type="text/javascript">
+var _comscore = _comscore || [];
+_comscore.push({ c1: "2", c2: "6036030", c4: "ngemu.com" });
+(function() {
+var s = document.createElement("script"), el =
+document.getElementsByTagName("script")[0]; s.async = true;
+s.src = (document.location.protocol == "https:" ? "https://sb" :
+"http://b") + ".scorecardresearch.com/beacon.js";
+el.parentNode.insertBefore(s, el);
+})(); </script>
+<noscript> <img src="http://b.scorecardresearch.com/p?c1=2&c2=6036030&c4=ngemu.com&cv=2.0&cj=1" alt="" /> </noscript>
+
+<script type="text/javascript">
+  var vglnk = { api_url: '//api.viglink.com/api',
+                key: '4d87d6b2d3447630c3498fa316288b3a' };
+
+  (function(d, t) {
+    var s = d.createElement(t); s.type = 'text/javascript'; s.async = true;
+    s.src = ('https:' == document.location.protocol ? vglnk.api_url :
+             '//cdn.viglink.com/api') + '/vglnk.js';
+    var r = d.getElementsByTagName(t)[0]; r.parentNode.insertBefore(s, r);
+  }(document, 'script'));
+</script>
+
+<script type="text/javascript">
+if (typeof(jQuery) == "undefined") { document.write('<scr' + 'ipt src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></scr' + 'ipt>'); }
+</script>
+<script type="text/javascript">
+jQuery(function($) {
+    $.ajax({ 
+        dataType: "json",	
+        type: "GET",  
+        url: "/videoplayer/cookie_consent.php?verifyUserGeoIp=true&sitename=ngemu.com",
+        success: function(response){
+            if (response.status == true) {
+                $("body").append(response.data);
+                eval(document.getElementById("vs_cookie_consent").innerHTML);
+            }
+        }  		
+    });
+});</script>
+
+<script type="text/javascript"> 
+    var xl8_script = document.createElement("script"); 
+    xl8_script.src = "https://loadus.exelator.com/load/?p=239&g=053&c=901810&ctg=videogames&cmake=&cmodel=&j=d"; 
+    xl8_script.type = "text/javascript"; 
+    xl8_script.async = true; 
+    document.body.appendChild(xl8_script); 
+</script>
+
+<!-- Adblock Check -->
+<div class="afs_ads">&nbsp;</div>
+<script>
+(function() {
+    var adBlockDetector = function() {
+        setTimeout(function() {
+            if (!document.getElementsByClassName) return;
+            
+            var ads = document.getElementsByClassName("afs_ads");
+            ad  = ads[ads.length - 1];
+
+            if (!ad || ad.innerHTML.length == 0 || ad.clientHeight === 0) {
+                _gaq.push(["_trackEvent", "Adblock", "Blocked", "true",,true]);
+            } else {
+                ad.style.display = "none";
+                _gaq.push(["_trackEvent", "Adblock", "Unblocked", "false",,true]);
+            }
+
+        }, 500);
+    }
+
+    /* Attach a listener for page load */
+    if (window.addEventListener) {
+        window.addEventListener("load", adBlockDetector, false);
+    } else {
+        window.attachEvent("onload", adBlockDetector); //IE
+    }
+})();
+</script>
+<!-- /Adblock Check-->
+<!-- Lotame -->
+<script src="//tags.crwdcntrl.net/c/8060/cc_af.js"></script>
+<!-- /Lotame -->
+
+<!-- /ConsolidatedFooters Footers -->
+
+
+
+</footer>
+
+<script>
+
+
+jQuery.extend(true, XenForo,
+{
+	visitor: { user_id: 0 },
+	serverTimeInfo:
+	{
+		now: 1497273535,
+		today: 1497250800,
+		todayDow: 1
+	},
+	_lightBoxUniversal: "0",
+	_enableOverlays: "1",
+	_animationSpeedMultiplier: "1",
+	_overlayConfig:
+	{
+		top: "10%",
+		speed: 200,
+		closeSpeed: 100,
+		mask:
+		{
+			color: "rgb(255, 255, 255)",
+			opacity: ".06",
+			loadSpeed: 200,
+			closeSpeed: 100
+		}
+	},
+	_ignoredUsers: [],
+	_loadedScripts: {"thread_view":true,"message":true,"bb_code":true,"message_user_info":true,"share_page":true,"bbcm_js":true,"login_bar":true,"facebook":true},
+	_cookieConfig: { path: "/", domain: "", prefix: "xf_"},
+	_csrfToken: "",
+	_csrfRefreshUrl: "login/csrf-token-refresh",
+	_jsVersion: "a3b17423"
+});
+jQuery.extend(XenForo.phrases,
+{
+	cancel: "Cancel",
+
+	a_moment_ago:    "A moment ago",
+	one_minute_ago:  "1 minute ago",
+	x_minutes_ago:   "%minutes% minutes ago",
+	today_at_x:      "Today at %time%",
+	yesterday_at_x:  "Yesterday at %time%",
+	day_x_at_time_y: "%day% at %time%",
+
+	day0: "Sunday",
+	day1: "Monday",
+	day2: "Tuesday",
+	day3: "Wednesday",
+	day4: "Thursday",
+	day5: "Friday",
+	day6: "Saturday",
+
+	_months: "January,February,March,April,May,June,July,August,September,October,November,December",
+	_daysShort: "Sun,Mon,Tue,Wed,Thu,Fri,Sat",
+
+	following_error_occurred: "The following error occurred",
+	server_did_not_respond_in_time_try_again: "The server did not respond in time. Please try again.",
+	logging_in: "Logging in",
+	click_image_show_full_size_version: "Click this image to show the full-size version.",
+	show_hidden_content_by_x: "Show hidden content by {names}"
+});
+
+// Facebook Javascript SDK
+XenForo.Facebook.appId = "1430755973803378";
+XenForo.Facebook.forceInit = true;
+
+
+</script>
+
+
+
+
+
+
+</body>
+</html>

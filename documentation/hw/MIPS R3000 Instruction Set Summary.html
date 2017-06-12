@@ -1,0 +1,292 @@
+
+<!-- saved from url=(0052)https://vhouten.home.xs4all.nl/mipsel/r3000-isa.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>MIPS R3000 Instruction Set Summary</title>
+</head><body>
+
+<center>
+<h1>MIPS R3000 Instruction Set Summary</h1>
+</center>
+
+<center>
+<h3> <a name="operands"> MIPS Operands </a> </h3>
+</center>
+	<table border="">
+	<tbody><tr><th> Name </th>
+	<th> Example </th>
+	<th> Comments </th>
+	</tr><tr>
+	<td align="center"> 32 registers </td>
+	<td> $0, $1, $2,..., $31 </td>
+	<td> Fast location for data. In MIPS, data must be in registers to perform arithmetic. MIPS register $0 always equal 0. Register $1 is reserved for the assembler to handle pseudo instructions and large constants</td>
+	</tr><tr>
+	<td align="center"> 2<sup>30</sup> memory words </td>
+	<td> Memory[0], <br> Memory[4],..., <br> Memory[4293967292] </td>
+	<td> Accessed only by data transfer instructions. MIPS uses byte addresses, so sequential words differ by 4. Memory holds data structures, such as arrays, and spilled registers, such as those saved on procedure calls </td>
+	</tr></tbody></table>
+<hr>
+
+<center>
+<h3> <a name="assembly"> MIPS Assembler Instructions </a> </h3>
+</center>
+	<table border="">
+	<tbody><tr><th> Category </th>
+	<th> Instruction </th>
+	<th> Example </th>
+	<th> Meaning </th>
+	<th> Comments </th>
+	</tr><tr>
+	<td align="center" rowspan="7"> Arithmetic </td>
+	<td> add </td>
+	<td> add $1,$2,$3 </td>
+	<td> $1 = $2 + $3 </td>
+	<td> 3 operands; exception possible </td>
+	</tr><tr>
+	<td> subtract </td>
+	<td> sub $1,$2,$3 </td>
+	<td> $1 = $2 - $3 </td>
+	<td> 3 operands; exception possible </td>
+	</tr><tr>
+	<td> add immediate </td>
+	<td> addi $1,$2,100 </td>
+	<td> $1 = $2 + 100 </td>
+	<td> + constant; exception possible </td>
+	</tr><tr>
+	<td> add unsigned </td>
+	<td> addu $1,$2,$3 </td>
+	<td> $1 = $2 + $3 </td>
+	<td> 3 operands; exception possible </td>
+	</tr><tr>
+	<td> subtract unsigned </td>
+	<td> subi $1,$2,$3 </td>
+	<td> $1 = $2 - $3 </td>
+	<td> 3 operands; exception possible </td>
+	</tr><tr>
+	<td> add immediate unsigned </td>
+	<td> addi $1,$2,100 </td>
+	<td> $1 = $2 + 100 </td>
+	<td> + constant; exception possible </td>
+	</tr><tr>
+	<td> Move from coprocessor register </td>
+	<td> mfc0 $1,$epc </td>
+	<td> $1 = $epc </td>
+	<td> Used to get of Exception PC </td>
+	</tr><tr>
+	<td align="center" rowspan="6"> Logical </td>
+	<td> and </td>
+	<td> and $1,$2,$3 </td>
+	<td> $1 = $2 &amp; $3 </td>
+	<td> 3 register operands; Logical AND </td>
+	</tr><tr>
+	<td> or </td>
+	<td> or $1,$2,$3 </td>
+	<td> $1 = $2 | $3 </td>
+	<td> 3 register operands; Logical OR </td>
+	</tr><tr>
+	<td> and immediate </td>
+	<td> and $1,$2,100 </td>
+	<td> $1 = $2 &amp; 100 </td>
+	<td> Logical AND register, constant </td>
+	</tr><tr>
+	<td> or immediate </td>
+	<td> or $1,$2,100 </td>
+	<td> $1 = $2 | 100 </td>
+	<td> Logical OR register, constant </td>
+	</tr><tr>
+	<td> shift left logical </td>
+	<td> sll $1,$2,10 </td>
+	<td> $1 = $2 &lt;&lt; 10 </td>
+	<td> Shift left by constant </td>
+	</tr><tr>
+	<td> shift right logical </td>
+	<td> srl $1,$2,10 </td>
+	<td> $1 = $2 &gt;&gt; 10 </td>
+	<td> Shift right by constant </td>
+	</tr><tr>
+	<td align="center" rowspan="3"> Data transfer </td>
+	<td> load word </td>
+	<td> lw $1,(100)$2 </td>
+	<td> $1 = Memory[$2+100] </td>
+	<td> Data from memory to register </td>
+	</tr><tr>
+	<td> store word </td>
+	<td> sw $1,(100)$2 </td>
+	<td> Memory[$2+100] = $1 </td>
+	<td> Data from memory to register </td>
+	</tr><tr>
+	<td> load upper immediate </td>
+	<td> lui $1,100 </td>
+	<td> $1 = 100 * 2<sup>16</sup> </td>
+	<td> Load constant in upper 16bits </td>
+	</tr><tr>
+	<td align="center" rowspan="6"> Conditional branch </td>
+	<td> branch on equal </td>
+	<td> beq $1,$2,100 </td>
+	<td> if ($1 == $2) go to PC+4+100 </td>
+	<td> Equal test; PC relative branch </td>
+	</tr><tr>
+	<td> branch on not equal </td>
+	<td> bne $1,$2,100 </td>
+	<td> if ($1 != $2) go to PC+4+100 </td>
+	<td> Not equal test; PC relative </td>
+	</tr><tr>
+	<td> set on less than </td>
+	<td> slt $1,$2,$3 </td>
+	<td> if ($2 &lt; $3) $1 = 1; else $1 = 0 </td>
+	<td> Compare less than; 2`s complement </td>
+	</tr><tr>
+	<td> set less than immediate </td>
+	<td> slti $1,$2,100 </td>
+	<td> if ($2 &lt; 100) $1 = 1; else $1 = 0 </td>
+	<td> Compare &lt; constant; 2`s complement </td>
+	</tr><tr>
+	<td> set less than unsigned </td>
+	<td> sltu $1,$2,$3 </td>
+	<td> if ($2 &lt; $3) $1 = 1; else $1 = 0 </td>
+	<td> Compare less than; natural number </td>
+	</tr><tr>
+	<td> set less than immediate unsigned </td>
+	<td> sltiu $1,$2,100 </td>
+	<td> if ($2 &lt; 100) $1 = 1; else $1 = 0 </td>
+	<td> Compare constant; natural number </td>
+	</tr><tr>
+	<td align="center" rowspan="3"> Unconditional jump </td>
+	<td> jump </td>
+	<td> j 10000 </td>
+	<td> goto 10000 </td>
+	<td> Jump to target address </td>
+	</tr><tr>
+	<td> jump register</td>
+	<td> j $31 </td>
+	<td> goto $31 </td>
+	<td> For switch, procedure return </td>
+	</tr><tr>
+	<td> jump and link </td>
+	<td> jal 10000 </td>
+	<td> $31 = PC + 4;go to 10000 </td>
+	<td> For procedure call </td>
+	</tr></tbody></table>
+<hr>
+
+<center>
+<h3> <a name="fp-operands"> MIPS Floating-Point Operands </a> </h3>
+</center>
+	<table border="">
+	<tbody><tr><th> Name </th>
+	<th> Example </th>
+	<th> Comments </th>
+	</tr><tr>
+	<td align="center"> 32 floating-point registers </td>
+	<td> $f0, $f1, $f2,..., $f31 </td>
+	<td> MIPS floating point register are used in pairs for double precision numbers. Odd numbered registers cannot be used for arithemetic or branch, just for data transfer of the right "half" of double precision register pairs. </td>
+	</tr><tr>
+	<td align="center"> 2<sup>30</sup> memory words </td>
+	<td> Memory[0], <br> Memory[4],..., <br> Memory[4293967292] </td>
+	<td> Accessed only by data transfer instructions. MIPS uses byte addresses, so sequential words differ by 4. Memory holds data structures, such as arrays, and spilled registers, such as those saved on procedure calls </td>
+	</tr></tbody></table>
+<hr>
+
+<center>
+<h3> <a name="fp-assemply"> MIPS Floating-Point Instructions </a> </h3>
+</center>
+	<table border="">
+	<tbody><tr><th> Category </th>
+	<th> Instruction </th>
+	<th> Example </th>
+	<th> Meaning </th>
+	<th> Comments </th>
+	</tr><tr>
+	<td align="center" rowspan="8"> Arithmetic </td>
+	<td> FP add single </td>
+	<td> add.s $f2,$f4,$f6 </td>
+	<td> $f2 = $f4 + $f6 </td>
+	<td> Floating-Point add (single precision) </td>
+	</tr><tr>
+	<td> FP subtract single </td>
+	<td> sub.s $f2,$f4,$f6 </td>
+	<td> $f2 = $f4 - $f6 </td>
+	<td> Floating-Point sub (single precision) </td>
+	</tr><tr>
+	<td> FP multiply single </td>
+	<td> mul.s $f2,$f4,$f6 </td>
+	<td> $f2 = $f4 * $f6 </td>
+	<td> Floating-Point multiply (single precision) </td>
+	</tr><tr>
+	<td> FP divide single </td>
+	<td> div.s $f2,$f4,$f6 </td>
+	<td> $f2 = $f4 / $f6 </td>
+	<td> Floating-Point divide (single precision) </td>
+	</tr><tr>
+	<td> FP add double </td>
+	<td> add.d $f2,$f4,$f6 </td>
+	<td> $f2 = $f4 + $f6 </td>
+	<td> Floating-Point add (double precision) </td>
+	</tr><tr>
+	<td> FP.dubtract double </td>
+	<td>.dub.d $f2,$f4,$f6 </td>
+	<td> $f2 = $f4 - $f6 </td>
+	<td> Floating-Point sub (double precision) </td>
+	</tr><tr>
+	<td> FP multiply double </td>
+	<td> mul.d $f2,$f4,$f6 </td>
+	<td> $f2 = $f4 * $f6 </td>
+	<td> Floating-Point multiply (double precision) </td>
+	</tr><tr>
+	<td> FP divide double </td>
+	<td> div.d $f2,$f4,$f6 </td>
+	<td> $f2 = $f4 / $f6 </td>
+	<td> Floating-Point divide (double precision) </td>
+	</tr><tr>
+	<td align="center" rowspan="2"> Data transfer </td>
+	<td> load word coprocessor 1 </td>
+	<td> lwc1 $f1,100($2) </td>
+	<td> $f1 = Memory[$2+100] </td>
+	<td> 32-bit data to FP register </td>
+	</tr><tr>
+	<td> store word coprocessor 1 </td>
+	<td> swc1 $f1,100($2) </td>
+	<td> Memory[$2+100] = $f1 </td>
+	<td> 32-bit data to memory </td>
+	</tr><tr>
+	<td align="center" rowspan="4"> Arithmetic </td>
+	<td> branch on FP true </td>
+	<td> bc1t 100 </td>
+	<td> if (cond == 1) go to PC+4+100 </td>
+	<td> PC relative branch if FP condition </td>
+	</tr><tr>
+	<td> branch on FP false </td>
+	<td> bc1f 100 </td>
+	<td> if (cond == 0) go to PC+4+100 </td>
+	<td> PC relative branch if not condition </td>
+	</tr><tr>
+	<td> FP compare single (eq,ne,lt,le,gt,ge) </td>
+	<td> c.lt.s $f2,$f4 </td>
+	<td> if ($f2 &lt; $f4) cond=1; else cond=0 </td>
+	<td> Floating-point compare less than single precision </td>
+	</tr><tr>
+	<td> FP compare double (eq,ne,lt,le,gt,ge) </td>
+	<td> c.lt.d $f2,$f4 </td>
+	<td> if ($f2 &lt; $f4) cond=1; else cond=0 </td>
+	<td> Floating-point compare less than double precision </td>
+	</tr></tbody></table>
+<hr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body></html>

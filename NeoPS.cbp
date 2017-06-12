@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="NeoPS" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug i686">
+				<Option output="bin/Debug/i686/NeoPS" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/i686/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="neops/include" />
+				</Compiler>
+			</Target>
+			<Target title="Release i686">
+				<Option output="bin/Release/i686/NeoPS" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/i686/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wfloat-equal" />
+			<Add option="-Wunreachable-code" />
+			<Add option="-Wmain" />
+			<Add option="-Wextra" />
+			<Add option="-Wall" />
+			<Add option="-std=c++11" />
+			<Add option="-m32" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Linker>
+			<Add option="-m32" />
+		</Linker>
+		<Unit filename="neops/include/cpu/cop0.hpp" />
+		<Unit filename="neops/include/cpu/r3000a.hpp" />
+		<Unit filename="neops/include/register.hpp" />
+		<Unit filename="neops/source/cpu/cop0.cpp" />
+		<Unit filename="neops/source/cpu/r3000a.cpp" />
+		<Unit filename="neops/source/main.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

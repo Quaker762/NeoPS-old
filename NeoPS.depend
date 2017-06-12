@@ -1,0 +1,20 @@
+# depslib dependency file v1.0
+1497259465 source:e:\users\jesse\documents\emu\neops\neops\source\main.cpp
+	<iostream>
+
+1497274753 source:e:\users\jesse\documents\emu\neops\neops\source\cpu\cop0.cpp
+	"cpu/cop0.hpp"
+
+1497274850 e:\users\jesse\documents\emu\neops\neops\include\cpu\cop0.hpp
+	<cstdint>
+
+1497275147 source:e:\users\jesse\documents\emu\neops\neops\source\cpu\r3000a.cpp
+	"cpu/r3000a.hpp"
+
+1497275129 e:\users\jesse\documents\emu\neops\neops\include\cpu\r3000a.hpp
+	<cstdint>
+	"register.hpp"
+	"cpu/cop0.hpp"
+
+1497274295 e:\users\jesse\documents\emu\neops\neops\include\register.hpp
+

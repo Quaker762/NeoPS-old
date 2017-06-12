@@ -1,0 +1,393 @@
+
+<!-- saved from url=(0034)http://psx.rules.org/psxrul2.shtml -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+
+
+
+<title>
+
+psx.padua.org | Playstation Development | psx.padua.org
+
+</title>
+
+</head>
+
+<body text="#FFFFFF" bgcolor="#000000" link="#33CCFF" vlink="#3366FF" alink="#FF6666">
+
+
+
+<center><font face="Bookman Old Style">
+
+
+
+<table width="600" border="0" cellspacing="2" cellpadding="0">
+
+ <tbody><tr bgcolor="#006080">
+
+	<td width="600" colspan="2" align="CENTER" valign="TOP"><font size="+3"><b><i>PADUA PLAYSTATION RESOURCE</i></b></font>
+
+	</td>
+
+ </tr>
+
+ <tr bgcolor="#000080">
+
+	<td colspan="2" width="600" align="JUSTIFY" valign="TOP">
+
+	Hey there, welcome to the Padua playstation coding resource site. Right now there's
+
+	a couple of docs compiled by yours sincerely, some sources and other interesting
+
+	stuff. Everything here assumes you're into ASM coding (to hell with C!:) and it's 
+
+	all quite lowlevelish.. No responsibility taken for anything occurring using these
+
+	materials. These are NOT official SONY docs and have no relation to those.
+
+	All sources are in the syntax of SPASM, the excellent free assembler by Silpheed/HITMEN,
+
+	which you can download from here too. Don't expect any updates any time soon, because 
+	
+	I severely lack time to do all this (and ofcourse because of the uncountable 'gimme 
+	
+	infos' people out there.)
+
+	</td>
+
+ </tr><tr bgcolor="#006080">
+
+	<td colspan="2" width="600" align="RIGHT" valign="TOP"><font size="+1">Documentation.</font>
+
+	</td>
+
+ </tr>
+
+
+
+    <tr bgcolor="#000080">
+
+	<td width="482" align="JUSTIFY" valign="TOP">
+
+	R3000 instructions, cop0, some system calls, pc-fileserver, root counters, DMA. (Last update Nov/03/1999)	
+
+	</td>
+
+        <td width="122" align="CENTER" valign="CENTER"><a href="http://psx.rules.org/system.txt">SYSTEM.txt</a></td>
+
+    </tr>    
+
+    <tr bgcolor="#000080">
+
+	<td width="480" align="JUSTIFY" valign="TOP">
+
+        GPU explanations and operations. Basicly all you need to know about it. (Last update Nov/03/1999)
+
+	</td>
+
+        <td width="120" align="CENTER" valign="CENTER"><a href="http://psx.rules.org/gpu.txt">GPU.txt</a></td>
+
+    </tr>
+
+    <tr bgcolor="#000080">
+
+	<td width="480" align="JUSTIFY" valign="TOP">
+
+	 Some basic info on the SPU.(Last update
+
+	Nov/03/1999)
+
+	</td>
+
+	<td width="120" align="CENTER" valign="CENTER">
+
+         <a href="http://psx.rules.org/spu.txt">SPU.txt</a>
+
+        </td>
+
+    </tr>
+
+    <tr bgcolor="#000080">
+
+	<td width="480" align="JUSTIFY" valign="TOP">
+
+	 Finally a new version of my GTE doc is here. Completely revamped, this should contain most of
+
+	 what you should know.  (Last update Mar/09/2000)
+
+	</td>
+
+	<td width="120" align="CENTER" valign="CENTER">
+
+         <a href="http://psx.rules.org/gte.txt">GTE.txt</a>
+
+        </td>
+
+    </tr>
+
+    <tr bgcolor="#000080">
+
+	<td width="480" align="JUSTIFY" valign="TOP">
+
+	 A small little file about low-level CD controlling. Don't expect too much, but it might get
+
+	 you started in your own explorations. 
+
+	(Last update Feb/06/2000)
+
+	</td>
+
+	<td width="120" align="CENTER" valign="CENTER">
+
+         <a href="http://psx.rules.org/cdinfo.txt">CDINFO.txt</a>
+
+        </td>
+
+    </tr>
+
+  <tr bgcolor="#006080">
+
+  <td colspan="2" width="600" align="RIGHT" valign="TOP"><font size="+1">Sources.</font>
+
+  </td>
+
+ </tr>
+
+    <tr bgcolor="#000080">
+
+	<td width="482" align="JUSTIFY" valign="TOP">A small routine to print text to
+
+	 the psx screen, in assembly. Not really beautiful code, but it works.
+
+	</td>
+
+	<td width="122" align="CENTER" valign="CENTER">
+
+         <a href="http://psx.rules.org/printgpu.zip">PRINTGPU.ZIP</a>
+
+        </td>
+
+    </tr> 
+
+    <tr bgcolor="#000080">
+
+	<td width="482" align="JUSTIFY" valign="TOP">Wondered about the how or what of root 
+
+        counters? Then check out this quick example. It now also demonstrates how to play a
+
+        mod using Silpheed's modplayer for ASM.  (Last update Nov/03/1999)
+
+	</td>
+
+	<td width="122" align="CENTER" valign="CENTER">
+
+         <a href="http://psx.rules.org/rootexmp.zip">ROOTEXMP.ZIP</a>
+
+        </td>
+
+    </tr>   
+
+     <tr bgcolor="#000080">
+
+        <td width="482" align="JUSTIFY" valign="TOP">I know some of you wanted this, so here it is:
+
+        a simple vertical blank irq. No more nasty initpad vsync, but a proper counter.(Last update Nov/03/1999)
+
+	</td>
+
+	<td width="122" align="CENTER" valign="CENTER">
+
+         <a href="http://psx.rules.org/vblank.zip">VBLANK.ZIP</a>
+
+        </td>
+
+    </tr>   
+
+
+
+
+
+ <tr bgcolor="#006080">
+
+  <td colspan="2" width="600" align="RIGHT" valign="TOP"><font size="+1">Tools.</font>
+
+  </td>
+
+ </tr>
+
+    <tr bgcolor="#000080">
+
+	<td width="482" align="JUSTIFY" valign="TOP">
+
+	Latest version of the excellent R3000 assembler by Silpheed/Hitmen. (The cop2 instructions
+
+	are fixed in this one)
+
+	</td>
+
+	<td width="122" align="CENTER" valign="CENTER">
+
+         <a href="http://psx.rules.org/spasm034.zip">SPASM034.ZIP</a>
+
+        </td>
+
+    </tr> 
+
+    <tr bgcolor="#000080">
+
+	<td width="482" align="JUSTIFY" valign="TOP">
+
+        Objdis v1.3. The latest update of surfsmurfs way cool .obj disassembler. New in this version
+        is disassembly of the GTE functions.
+
+        </td>
+
+	<td width="122" align="CENTER" valign="CENTER">
+
+         <a href="http://psx.rules.org/objdis.zip">objdis.zip</a>
+
+        </td>
+
+    </tr> 
+
+
+
+
+
+ <tr bgcolor="#006080">
+
+  <td colspan="2" width="600" align="RIGHT" valign="TOP"><font size="+1">Links.</font>
+
+  </td>
+
+ </tr>
+
+    <tr bgcolor="#000080">
+
+	<td width="482" align="JUSTIFY" valign="TOP">
+
+	The C64 demo group.<br><br>
+
+	</td>
+
+	<td width="122" align="CENTER" valign="CENTER">
+
+         <a href="http://www.padua.org/">Padua</a>
+
+        </td>
+
+    </tr>
+
+    <tr bgcolor="#000080">
+
+	<td width="482" align="JUSTIFY" valign="TOP">
+
+	Coming from c64 these were one of the first PSX groups.<br><br>
+
+	</td>
+
+	<td width="122" align="CENTER" valign="CENTER">
+
+         <a href="http://www.hitmen-console.org/">Hitmen</a>
+
+        </td>
+
+    </tr>
+
+    <tr bgcolor="#000080">
+
+	<td width="482" align="JUSTIFY" valign="TOP">
+
+	If you have no clue as to what this is all about
+
+	read the faq on the pages of these guys.<br>
+
+	</td>
+
+	<td width="122" align="CENTER" valign="CENTER">
+
+      	<a href="http://napalm.intelinet.com/">Napalm</a>
+
+        </td>
+
+    </tr>
+    <tr bgcolor="#000080">
+
+	<td width="482" align="JUSTIFY" valign="TOP">
+
+	Paradox intro maestro Van Helsing shows us the ropes here.<br><br>
+
+	</td>
+
+	<td width="122" align="CENTER" valign="CENTER">
+
+      	<a href="http://dev.paradogs.com/">Graveland</a>
+
+        </td>
+
+    </tr>
+
+    <tr bgcolor="#000080">
+
+	<td width="482" align="JUSTIFY" valign="TOP">
+
+	Lotsa other docs, tools and a shitload of links at Loser's site.<br><br>
+
+	</td>
+
+	<td width="122" align="CENTER" valign="CENTER">
+
+      	<a href="http://start.at/loser-psx">Loser-psx</a>
+
+        </td>
+
+    </tr>
+
+    <tr bgcolor="#000080">
+
+	<td width="482" align="JUSTIFY" valign="TOP">
+
+	Get caetla v0.35 from here. They finally have a small
+
+	<a href="http://www3.airnet.ne.jp/kcomm/cae/caetlae.html">english section</a>
+
+	for us non .jp people :)
+
+	</td>
+
+	<td width="122" align="CENTER" valign="CENTER">
+
+      	<a href="http://www3.airnet.ne.jp/kcomm">K-communications</a>
+
+        </td>
+
+    </tr>
+
+<tr bgcolor="#006080">
+
+
+
+  <td colspan="2" width="600" align="RIGHT" valign="TOP">
+
+  Last updated Jul/05/2000. This page has been served [an error occurred while processing this directive] times, since the counter got screwed.<br>
+
+  Take care.. Doomed/Padua.
+
+  </td>
+
+
+
+
+
+
+
+</tr></tbody></table>
+
+
+
+</font></center><font face="Bookman Old Style">
+
+
+
+
+
+</font></body></html>
