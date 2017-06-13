@@ -18,6 +18,22 @@
 
 using namespace cpu;
 
+///+++++++++++++++++++UTIL FUNCTIONS!!+++++++++++++++++++//
+static std::uint32_t get_rs(std::uint32_t instruction)
+{
+    return (instruction >> 20) & 0x04;
+}
+
+static std::uint32_t get_rt(std::uint32_t instruction)
+{
+    return (instruction >> 16) & 0x04;
+}
+
+static std::uint32_t get_rd(std::uint32_t instruction)
+{
+    return (instruction >> 10) & 0x04;
+}
+
 
 ///+++++++++++++++++++STATIC CPU INSTRUCTIONS!!+++++++++++++++++++//
 
@@ -29,13 +45,13 @@ using namespace cpu;
  *
  *  @exception Arithmetic overflow causes an exception.
  */
-static void r300a_add(r3000a& cpu)
+void r300a_add(r3000a& cpu)
 {
-    int rs = (cpu.instruction >> 20) & 0x04;
-    int rt = (cpu.instruction >> 16) & 0x04;
-    int rd = (cpu.instruction >> 10) & 0x04;
+    int rs = get_rs(cpu.instruction);
+    int rt = get_rt(cpu.instruction);
+    int rd = get_rd(cpu.instruction);
 
-    if((std::uint64_t)(cpu.gpr[rs] + cpu.gpr[rt]) > 0xFFFFFFFF)
+    if((cpu.gpr[rs] + cpu.gpr[rt]) > 0x7FFFFFFF)
     {
         cpu.cp0->trigger_exception(cop0::ARITHMETIC_OVERFLOW);
         return; // Addition Does NOT occur!
@@ -52,13 +68,14 @@ static void r300a_add(r3000a& cpu)
  *
  *  @exception An overflow exception occurs if carries out of bits 30 and 31 differ (2's compliment overflow).
  */
-static void r300a_addi(r3000a& cpu)
+void r300a_addi(r3000a& cpu)
 {
     std::uint32_t imm = (cpu.instruction & 0xFFFF) | 0xFFFF0000; // Sign extend WORD.
-    int rt = (cpu.instruction >> 16) & 0x04;
-    int rs = (cpu.instruction >> 20) & 0x04;
+    int rt = get_rt(cpu.instruction);
+    int rs = get_rs(cpu.instruction);
 
-    if((std::uint64_t)(cpu.gpr[rs] + imm) > 0xFFFFFFFF)
+
+    if((cpu.gpr[rs] + imm) > 0x7FFFFFFF)
     {
         cpu.cp0->trigger_exception(cop0::ARITHMETIC_OVERFLOW);
         return; // Addition does NOT occur!
@@ -75,21 +92,14 @@ static void r300a_addi(r3000a& cpu)
  *
  *  @exception Under no circumstance should an overflow exception be triggered!
  */
-static void r300a_addiu(r3000a& cpu)
+void r300a_addiu(r3000a& cpu)
 {
     std::uint32_t imm = (cpu.instruction & 0xFFFF) | 0xFFFF0000; // Sign extend WORD.
-    int rt = (cpu.instruction >> 16) & 0x04;
-    int rs = (cpu.instruction >> 20) & 0x04;
+    int rt = get_rt(cpu.instruction);
+    int rs = get_rs(cpu.instruction);
 
-    std::uint64_t temp = cpu.gpr[rs] + imm;
-    if(temp > 0xFFFFFFFF)
-    {
-        // TODO: What the fuck!?! Refer to page 221 of R3000.pdf!
-    }
-    else
-    {
-        cpu.gpr[rt] = temp;
-    }
+    std::uint32_t temp = (cpu.gpr[rs] + imm);
+    cpu.gpr[rt] = temp;
 }
 
 /**
@@ -100,7 +110,7 @@ static void r300a_addiu(r3000a& cpu)
  *
  *  @exception Under no circumstance should an overflow exception be triggered!
  */
-static void r300a_addu(r3000a& cpu)
+void r300a_addu(r3000a& cpu)
 {
 
 }
@@ -113,11 +123,11 @@ static void r300a_addu(r3000a& cpu)
  *  The result is placed into general register rd.
  *  @exception None
  */
-static void r300a_and(r3000a& cpu)
+void r300a_and(r3000a& cpu)
 {
-    int rs = (cpu.instruction >> 20) & 0x04;
-    int rt = (cpu.instruction >> 16) & 0x04;
-    int rd = (cpu.instruction >> 10) & 0x04;
+    int rs = get_rs(cpu.instruction);
+    int rt = get_rt(cpu.instruction);
+    int rd = get_rd(cpu.instruction);
 
     cpu.gpr[rd] = cpu.gpr[rs] & cpu.gpr[rt];
 }
@@ -130,13 +140,99 @@ static void r300a_and(r3000a& cpu)
  *  The result is placed into general register rt.
  *  @exception None
  */
-static void r300a_andi(r3000a& cpu)
+void r300a_andi(r3000a& cpu)
 {
     std::uint32_t imm = (cpu.instruction & 0x0000FFFF); // TODO: Are bits 16-32 zeroed out?
-    int rs = (cpu.instruction >> 20) & 0x04;
-    int rt = (cpu.instruction >> 16) & 0x04;
+    int rs = get_rs(cpu.instruction);
+    int rt = get_rt(cpu.instruction);
 
     cpu.gpr[rt] = cpu.gpr[rs] & imm;
+}
+
+/**
+ *  Branch if Equal
+ *
+ *  Format: BEQ rs, rt, offset
+ *  Compares gpr[rs] and gpr[rt]. If they are equal, then the program counter is incremented by offset << 2
+ *  @exception None
+ */
+void r300a_beq(r3000a& cpu)
+{
+    int rs = get_rs(cpu.instruction);
+    int rt = get_rt(cpu.instruction);
+    std::uint32_t offset = cpu.instruction & 0x0000FFFF;
+
+    if(cpu.gpr[rs] == cpu.gpr[rt]){}
+        // TODO: Weird RISC delay PC...
+}
+
+/**
+ *  Branch if Greater than or Equal to
+ *
+ *  Format: BGEZ rs, rt, offset
+ *  Compares bit 31 of gpr[rs]. If it is cleared, program branches to (offset << 2) with a delay of 1 instruction.
+ *  @exception None
+ */
+void r300a_bgez(r3000a& cpu)
+{
+    int rs = get_rs(cpu.instruction);
+    std::uint32_t offset = cpu.instruction & 0x0000FFFF;
+
+    if((cpu.gpr[rs] & 0x80000000) == 0){}
+        // TODO: Weird RISC delay PC...
+}
+
+void r3000a_bgezal(r3000a& cpu)
+{
+    int rs = get_rs(cpu.instruction);
+    std::uint32_t offset = cpu.instruction & 0x0000FFFF;
+
+    cpu.gpr[31] = cpu.pc + 8;
+
+    if((cpu.gpr[rs] & 0x80000000) == 0){}
+        // TODO: Weird RISC delay PC...
+}
+
+void r3000a_bgtz(r3000a& cpu)
+{
+    int rs = get_rs(cpu.instruction);
+    std::uint32_t offset = cpu.instruction & 0x0000FFFF;
+
+    if((cpu.gpr[rs] & 0x80000000) == 0 && cpu.gpr[rs] != 0){}
+        // TODO: Weird RISC delay PC...
+}
+
+void r3000a_blez(r3000a& cpu)
+{
+    int rs = get_rs(cpu.instruction);
+    std::uint32_t offset = cpu.instruction & 0x0000FFFF;
+
+    if((cpu.gpr[rs] & 0x80000000) && cpu.gpr[rs] == 0){}
+        // TODO: Weird RISC delay PC...
+}
+
+void r3000a_bltz(r3000a& cpu)
+{
+    int rs = get_rs(cpu.instruction);
+    std::uint32_t offset = cpu.instruction & 0x0000FFFF;
+
+    if((cpu.gpr[rs] & 0x80000000)){}
+        // TODO: Weird RISC delay PC...
+}
+
+void r3000a_bltzal(r3000a& cpu)
+{
+
+}
+
+void r3000a_bne(r3000a& cpu)
+{
+
+}
+
+void r3000a_break(r3000a& cpu)
+{
+    cpu.cop0->trigger_exception(cop0::BREAKPOINT);
 }
 
 ///+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

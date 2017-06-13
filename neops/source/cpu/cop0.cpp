@@ -28,3 +28,7 @@ cop0::~cop0()
 
 }
 
+void cop0::trigger_exception(EXCEPTION_TYPE ex)
+{
+
+}
