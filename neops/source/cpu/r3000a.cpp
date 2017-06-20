@@ -12,28 +12,11 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+    along with NeoPS.  If not, see <http://www.gnu.org/licenses/>.
 **/
 #include "cpu/r3000a.hpp"
 
 using namespace cpu;
-
-///+++++++++++++++++++UTIL FUNCTIONS!!+++++++++++++++++++//
-static std::uint32_t get_rs(std::uint32_t instruction)
-{
-    return (instruction >> 20) & 0x04;
-}
-
-static std::uint32_t get_rt(std::uint32_t instruction)
-{
-    return (instruction >> 16) & 0x04;
-}
-
-static std::uint32_t get_rd(std::uint32_t instruction)
-{
-    return (instruction >> 10) & 0x04;
-}
-
 
 ///+++++++++++++++++++STATIC CPU INSTRUCTIONS!!+++++++++++++++++++//
 
@@ -47,17 +30,17 @@ static std::uint32_t get_rd(std::uint32_t instruction)
  */
 void r300a_add(r3000a& cpu)
 {
-    int rs = get_rs(cpu.instruction);
-    int rt = get_rt(cpu.instruction);
-    int rd = get_rd(cpu.instruction);
+    int rs = cpu.get_instruction().r_type.rs;
+    int rt = cpu.get_instruction().r_type.rt;
+    int rd = cpu.get_instruction().r_type.rd;
 
-    if((cpu.gpr[rs] + cpu.gpr[rt]) > 0x7FFFFFFF)
+    if((cpu.read_gpr(rs) + cpu.read_gpr(rt)) > 0x7FFFFFFF)
     {
-        cpu.cp0->trigger_exception(cop0::ARITHMETIC_OVERFLOW);
+        cpu.get_cop0()->trigger_exception(cop0::ARITHMETIC_OVERFLOW);
         return; // Addition Does NOT occur!
     }
 
-    cpu.gpr[rd] = cpu.gpr[rs] + cpu.gpr[rt];
+    cpu.write_gpr(rd, cpu.read_gpr(rs) + cpu.read_gpr(rt));
 }
 
 /**
@@ -70,18 +53,18 @@ void r300a_add(r3000a& cpu)
  */
 void r300a_addi(r3000a& cpu)
 {
-    std::uint32_t imm = (cpu.instruction & 0xFFFF) | 0xFFFF0000; // Sign extend WORD.
-    int rt = get_rt(cpu.instruction);
-    int rs = get_rs(cpu.instruction);
+    std::uint32_t imm = cpu.get_instruction().i_type.imm | 0xFFFF0000; // Sign extend WORD.
+    int rt = imm = cpu.get_instruction().i_type.rt;
+    int rs = imm = cpu.get_instruction().i_type.rs;
 
 
-    if((cpu.gpr[rs] + imm) > 0x7FFFFFFF)
+    if((cpu.read_gpr(rs) + imm) > 0x7FFFFFFF)
     {
-        cpu.cp0->trigger_exception(cop0::ARITHMETIC_OVERFLOW);
+        cpu.get_cop0()->trigger_exception(cop0::ARITHMETIC_OVERFLOW);
         return; // Addition does NOT occur!
     }
 
-    cpu.gpr[rt] = cpu.gpr[rs] + imm;
+    cpu.write_gpr(rt, cpu.read_gpr(rs) + imm);
 }
 
 /**
@@ -94,12 +77,12 @@ void r300a_addi(r3000a& cpu)
  */
 void r300a_addiu(r3000a& cpu)
 {
-    std::uint32_t imm = (cpu.instruction & 0xFFFF) | 0xFFFF0000; // Sign extend WORD.
-    int rt = get_rt(cpu.instruction);
-    int rs = get_rs(cpu.instruction);
+    std::uint32_t imm = cpu.get_instruction().i_type.imm | 0xFFFF0000; // Sign extend WORD.
+    int rt = cpu.get_instruction().i_type.rt;
+    int rs = cpu.get_instruction().i_type.rs;
 
-    std::uint32_t temp = (cpu.gpr[rs] + imm);
-    cpu.gpr[rt] = temp;
+    std::uint32_t temp = (cpu.read_gpr(rs) + imm);
+    cpu.write_gpr(rt, temp);
 }
 
 /**
@@ -125,11 +108,11 @@ void r300a_addu(r3000a& cpu)
  */
 void r300a_and(r3000a& cpu)
 {
-    int rs = get_rs(cpu.instruction);
-    int rt = get_rt(cpu.instruction);
-    int rd = get_rd(cpu.instruction);
+    int rs = cpu.get_instruction().r_type.rs;
+    int rt = cpu.get_instruction().r_type.rt;
+    int rd = cpu.get_instruction().r_type.rd;
 
-    cpu.gpr[rd] = cpu.gpr[rs] & cpu.gpr[rt];
+    cpu.write_gpr(rd, cpu.read_gpr(rs) & cpu.read_gpr(rt));
 }
 
 /**
@@ -142,11 +125,11 @@ void r300a_and(r3000a& cpu)
  */
 void r300a_andi(r3000a& cpu)
 {
-    std::uint32_t imm = (cpu.instruction & 0x0000FFFF); // TODO: Are bits 16-32 zeroed out?
-    int rs = get_rs(cpu.instruction);
-    int rt = get_rt(cpu.instruction);
+    std::uint32_t imm = cpu.get_instruction().i_type.imm; // TODO: Are bits 16-32 zeroed out?
+    int rs = cpu.get_instruction().i_type.rs;
+    int rt = cpu.get_instruction().i_type.rt;
 
-    cpu.gpr[rt] = cpu.gpr[rs] & imm;
+    cpu.write_gpr(rt, cpu.read_gpr(rs) & imm);
 }
 
 /**
@@ -158,11 +141,11 @@ void r300a_andi(r3000a& cpu)
  */
 void r300a_beq(r3000a& cpu)
 {
-    int rs = get_rs(cpu.instruction);
-    int rt = get_rt(cpu.instruction);
-    std::uint32_t offset = cpu.instruction & 0x0000FFFF;
+    int rs = cpu.get_instruction().i_type.rs;
+    int rt = cpu.get_instruction().i_type.rt;
+    std::uint32_t offset = cpu.get_instruction().i_type.imm;
 
-    if(cpu.gpr[rs] == cpu.gpr[rt]){}
+    if(cpu.read_gpr(rs) == cpu.read_gpr(rt)){}
         // TODO: Weird RISC delay PC...
 }
 
@@ -175,48 +158,48 @@ void r300a_beq(r3000a& cpu)
  */
 void r300a_bgez(r3000a& cpu)
 {
-    int rs = get_rs(cpu.instruction);
-    std::uint32_t offset = cpu.instruction & 0x0000FFFF;
+    int rs = cpu.get_instruction().i_type.rs;
+    std::uint32_t offset = cpu.get_instruction().i_type.imm & 0x0000FFFF;
 
-    if((cpu.gpr[rs] & 0x80000000) == 0){}
+    if((cpu.read_gpr(rs) & 0x80000000) == 0){}
         // TODO: Weird RISC delay PC...
 }
 
 void r3000a_bgezal(r3000a& cpu)
 {
-    int rs = get_rs(cpu.instruction);
-    std::uint32_t offset = cpu.instruction & 0x0000FFFF;
+    int rs = cpu.get_instruction().i_type.rs;
+    std::uint32_t offset = cpu.get_instruction().i_type.imm & 0x0000FFFF;
 
-    cpu.gpr[31] = cpu.pc + 8;
+    cpu.write_gpr(31, cpu.get_pc() + 8);
 
-    if((cpu.gpr[rs] & 0x80000000) == 0){}
+    if((cpu.read_gpr(rs) & 0x80000000) == 0){}
         // TODO: Weird RISC delay PC...
 }
 
 void r3000a_bgtz(r3000a& cpu)
 {
-    int rs = get_rs(cpu.instruction);
-    std::uint32_t offset = cpu.instruction & 0x0000FFFF;
+    int rs = cpu.get_instruction().i_type.rs;
+    std::uint32_t offset = cpu.get_instruction().i_type.imm & 0x0000FFFF;
 
-    if((cpu.gpr[rs] & 0x80000000) == 0 && cpu.gpr[rs] != 0){}
+    if((cpu.read_gpr(rs) & 0x80000000) == 0 && cpu.read_gpr(rs) != 0){}
         // TODO: Weird RISC delay PC...
 }
 
 void r3000a_blez(r3000a& cpu)
 {
-    int rs = get_rs(cpu.instruction);
-    std::uint32_t offset = cpu.instruction & 0x0000FFFF;
+    int rs = cpu.get_instruction().i_type.rs;
+    std::uint32_t offset = cpu.get_instruction().i_type.imm & 0x0000FFFF;
 
-    if((cpu.gpr[rs] & 0x80000000) && cpu.gpr[rs] == 0){}
+    if((cpu.read_gpr(rs) & 0x80000000) && cpu.read_gpr(rs) == 0){}
         // TODO: Weird RISC delay PC...
 }
 
 void r3000a_bltz(r3000a& cpu)
 {
-    int rs = get_rs(cpu.instruction);
-    std::uint32_t offset = cpu.instruction & 0x0000FFFF;
+    int rs = cpu.get_instruction().i_type.rs;
+    std::uint32_t offset = cpu.get_instruction().i_type.imm & 0x0000FFFF;
 
-    if((cpu.gpr[rs] & 0x80000000)){}
+    if((cpu.read_gpr(rs) & 0x80000000)){}
         // TODO: Weird RISC delay PC...
 }
 
@@ -232,7 +215,7 @@ void r3000a_bne(r3000a& cpu)
 
 void r3000a_break(r3000a& cpu)
 {
-    cpu.cop0->trigger_exception(cop0::BREAKPOINT);
+    cpu.get_cop0()->trigger_exception(cop0::BREAKPOINT);
 }
 
 ///+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -245,6 +228,23 @@ r3000a::r3000a()
 r3000a::~r3000a()
 {
     delete cp0;
+}
+
+void r3000a::reset()
+{
+    //cp0->write_gpr();
+
+    pc = 0xbfc00000; // BIOS location.
+}
+
+std::uint32_t r3000a::read_gpr(unsigned reg) const
+{
+    return gpr[reg];
+}
+
+void r3000a::write_gpr(unsigned reg, std::uint32_t value)
+{
+    gpr[reg] = value;
 }
 
 
