@@ -1,9 +1,7 @@
 #include <iostream>
-
-using namespace std;
+#include "instruction.hpp"
 
 int main()
 {
-    cout << "Hello world!" << endl;
     return 0;
 }
