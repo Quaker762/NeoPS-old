@@ -26,24 +26,32 @@
 
 1498232285 e:\users\jesse\documents\emu\neops\neops\include\register.hpp
 
-1497362290 source:c:\users\quaker\documents\mosaic software\neops\neops\source\cpu\r3000a.cpp
+1498237770 source:c:\users\quaker\documents\mosaic software\neops\neops\source\cpu\r3000a.cpp
+	<cstdio>
 	"cpu/r3000a.hpp"
 
-1497361799 c:\users\quaker\documents\mosaic software\neops\neops\include\cpu\r3000a.hpp
+1498238376 c:\users\quaker\documents\mosaic software\neops\neops\include\cpu\r3000a.hpp
 	<cstdint>
 	"register.hpp"
 	"cpu/cop0.hpp"
+	"instruction.hpp"
 
-1497361799 c:\users\quaker\documents\mosaic software\neops\neops\include\register.hpp
+1498235871 c:\users\quaker\documents\mosaic software\neops\neops\include\register.hpp
 
-1497361799 c:\users\quaker\documents\mosaic software\neops\neops\include\cpu\cop0.hpp
+1498235871 c:\users\quaker\documents\mosaic software\neops\neops\include\cpu\cop0.hpp
 	<cstdint>
 
-1497361799 source:c:\users\quaker\documents\mosaic software\neops\neops\source\main.cpp
+1498235871 source:c:\users\quaker\documents\mosaic software\neops\neops\source\main.cpp
 	<iostream>
+	"bus/psmem.hpp"
+	"bios.hpp"
+	"cpu/r3000a.hpp"
 
-1497362403 source:c:\users\quaker\documents\mosaic software\neops\neops\source\cpu\cop0.cpp
+1498235871 source:c:\users\quaker\documents\mosaic software\neops\neops\source\cpu\cop0.cpp
+	<cstdio>
+	<cstdlib>
 	"cpu/cop0.hpp"
+	"bus/psmem.hpp"
 
 1498232285 source:e:\users\jesse\documents\emu\neops\neops\source\bus\psmem.cpp
 	<cassert>
@@ -63,5 +71,25 @@
 	<string>
 
 1498205152 e:\users\jesse\documents\emu\neops\neops\include\instruction.hpp
+	<cstdint>
+
+1498235871 source:c:\users\quaker\documents\mosaic software\neops\neops\source\bios.cpp
+	"bios.hpp"
+	<fstream>
+	<cassert>
+	<cstdio>
+
+1498235871 c:\users\quaker\documents\mosaic software\neops\neops\include\bios.hpp
+	<string>
+
+1498235871 source:c:\users\quaker\documents\mosaic software\neops\neops\source\bus\psmem.cpp
+	<cassert>
+	"bus/psmem.hpp"
+	"bios.hpp"
+
+1498235871 c:\users\quaker\documents\mosaic software\neops\neops\include\bus\psmem.hpp
+	<cstdint>
+
+1498235871 c:\users\quaker\documents\mosaic software\neops\neops\include\instruction.hpp
 	<cstdint>
 

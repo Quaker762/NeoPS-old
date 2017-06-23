@@ -36,6 +36,8 @@ namespace cpu
      */
     class r3000a
     {
+    typedef void (r3000a::*operation_t)();
+
     public:
         r3000a();
         ~r3000a();
@@ -73,22 +75,6 @@ namespace cpu
             return pc;
         }
 
-        /**
-         *  Get the current executing instruction
-         */
-        instruction_t get_instruction() const
-        {
-            return this->instruction;
-        }
-
-        /**
-         *  Get our coprocessor0 (MMU)
-         */
-        cop0* get_cop0() const
-        {
-            return this->cp0;
-        }
-
     private:
         cop0*           cp0; /**< Our CPU's cp0. */
         //cop2*           co2; /**< Our CPU's cop2. */
@@ -101,7 +87,25 @@ namespace cpu
         instruction_t   instruction;    /**< Current instruction. */
         instruction_t   next_instruction; /**< Branch delay emulation */
 
-        bool            has_branched;   /**< Has execution branched/jumped? */
+        operation_t ops_normal[64];
+        operation_t ops_special[64];
+
+        // INSTRUCTIONS
+        void op_add();
+        void op_addi();
+        void op_addiu();
+        void op_addu();
+        void op_op_and();
+        void op_andi();
+        void op_beq();
+        void op_bgez();
+        void op_bgezal();
+        void op_bgtz();
+        void op_blez();
+        void op_bltz();
+        void op_bltzal();
+        void op_bne();
+        void op_brk();
     };
 }
 

@@ -19,8 +19,6 @@
 
 using namespace cpu;
 
-typedef void (*operation_t)(r3000a& cpu);
-
  const char* cpu_gpr_names[] = { "zero", "at", "v0", "v1", "a0", "a1", "a2", "a3",
                                 "t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7",
                                 "t8", "t9", "s0", "s1", "s2", "s3", "s4", "s5",
@@ -36,19 +34,19 @@ typedef void (*operation_t)(r3000a& cpu);
  *
  *  @exception Arithmetic overflow causes an exception.
  */
-void r300a_add(r3000a& cpu)
+void r3000a::op_add()
 {
-    int rs = cpu.get_instruction().r_type.rs;
-    int rt = cpu.get_instruction().r_type.rt;
-    int rd = cpu.get_instruction().r_type.rd;
+    int rs = instruction.r_type.rs;
+    int rt = instruction.r_type.rt;
+    int rd = instruction.r_type.rd;
 
-    if((cpu.read_gpr(rs) + cpu.read_gpr(rt)) > 0x7FFFFFFF)
+    if((gpr[rs] + gpr[rt]) > 0x7FFFFFFF)
     {
-        cpu.get_cop0()->trigger_exception(cop0::ARITHMETIC_OVERFLOW);
+        cp0->trigger_exception(cop0::ARITHMETIC_OVERFLOW);
         return; // Addition Does NOT occur!
     }
 
-    cpu.write_gpr(rd, cpu.read_gpr(rs) + cpu.read_gpr(rt));
+    gpr[rd] = gpr[rs] + gpr[rt];
 }
 
 /**
@@ -59,19 +57,19 @@ void r300a_add(r3000a& cpu)
  *
  *  @exception An overflow exception occurs if carries out of bits 30 and 31 differ (2's compliment overflow).
  */
-void r300a_addi(r3000a& cpu)
+void r3000a::op_addi()
 {
-    std::uint32_t imm = (std::int16_t)cpu.get_instruction().i_type.imm; // Sign extend immediate value by casting to int16_t
-    int rt = imm = cpu.get_instruction().i_type.rt;
-    int rs = imm = cpu.get_instruction().i_type.rs;
+    std::uint32_t imm = (std::int16_t)instruction.i_type.imm; // Sign extend immediate value by casting to int16_t
+    int rt = imm = instruction.i_type.rt;
+    int rs = imm = instruction.i_type.rs;
 
-    if((cpu.read_gpr(rs) + imm) > 0x7FFFFFFF)
+    if((gpr[rs] + imm) > 0x7FFFFFFF)
     {
-        cpu.get_cop0()->trigger_exception(cop0::ARITHMETIC_OVERFLOW);
+        cp0->trigger_exception(cop0::ARITHMETIC_OVERFLOW);
         return; // Addition does NOT occur!
     }
 
-    cpu.write_gpr(rt, cpu.read_gpr(rs) + imm);
+    gpr[rt] = gpr[rs] + imm;
 }
 
 /**
@@ -82,14 +80,14 @@ void r300a_addi(r3000a& cpu)
  *
  *  @exception Under no circumstance should an overflow exception be triggered!
  */
-void r300a_addiu(r3000a& cpu)
+void r3000a::op_addiu()
 {
-    std::uint32_t imm = (std::int16_t)cpu.get_instruction().i_type.imm;
-    int rt = cpu.get_instruction().i_type.rt;
-    int rs = cpu.get_instruction().i_type.rs;
+    std::uint32_t imm = (std::int16_t)instruction.i_type.imm;
+    int rt = instruction.i_type.rt;
+    int rs = instruction.i_type.rs;
 
-    std::uint32_t temp = (cpu.read_gpr(rs) + imm);
-    cpu.write_gpr(rt, temp);
+    std::uint32_t temp = gpr[rs] + imm;
+    gpr[rt] = temp;
 }
 
 /**
@@ -100,7 +98,7 @@ void r300a_addiu(r3000a& cpu)
  *
  *  @exception Under no circumstance should an overflow exception be triggered!
  */
-void r300a_addu(r3000a& cpu)
+void r3000a::op_addu()
 {
 
 }
@@ -113,13 +111,13 @@ void r300a_addu(r3000a& cpu)
  *  The result is placed into general register rd.
  *  @exception None
  */
-void r300a_and(r3000a& cpu)
+void r3000a::op_op_and()
 {
-    int rs = cpu.get_instruction().r_type.rs;
-    int rt = cpu.get_instruction().r_type.rt;
-    int rd = cpu.get_instruction().r_type.rd;
+    int rs = instruction.r_type.rs;
+    int rt = instruction.r_type.rt;
+    int rd = instruction.r_type.rd;
 
-    cpu.write_gpr(rd, cpu.read_gpr(rs) & cpu.read_gpr(rt));
+    gpr[rd] = gpr[rs] & gpr[rt];
 }
 
 /**
@@ -130,13 +128,13 @@ void r300a_and(r3000a& cpu)
  *  The result is placed into general register rt.
  *  @exception None
  */
-void r300a_andi(r3000a& cpu)
+void r3000a::op_andi()
 {
-    std::uint32_t imm = cpu.get_instruction().i_type.imm & 0x0000FFFF; // TODO: Are bits 16-32 zeroed out?
-    int rs = cpu.get_instruction().i_type.rs;
-    int rt = cpu.get_instruction().i_type.rt;
+    std::uint32_t imm = instruction.i_type.imm & 0x0000FFFF; // TODO: Are bits 16-32 zeroed out?
+    int rs = instruction.i_type.rs;
+    int rt = instruction.i_type.rt;
 
-    cpu.write_gpr(rt, cpu.read_gpr(rs) & imm);
+    gpr[rt] = gpr[rs] & imm;
 }
 
 /**
@@ -146,13 +144,13 @@ void r300a_andi(r3000a& cpu)
  *  Compares gpr[rs] and gpr[rt]. If they are equal, then the program counter is incremented by offset << 2
  *  @exception None
  */
-void r300a_beq(r3000a& cpu)
+void r3000a::op_beq()
 {
-    int rs = cpu.get_instruction().i_type.rs;
-    int rt = cpu.get_instruction().i_type.rt;
-    std::uint32_t offset = cpu.get_instruction().i_type.imm;
+    int rs = instruction.i_type.rs;
+    int rt = instruction.i_type.rt;
+    std::uint32_t offset = instruction.i_type.imm;
 
-    if(cpu.read_gpr(rs) == cpu.read_gpr(rt)){}
+    if(gpr[rs] == gpr[rt]){}
         // TODO: Weird RISC delay PC...
 }
 
@@ -163,66 +161,66 @@ void r300a_beq(r3000a& cpu)
  *  Compares bit 31 of gpr[rs]. If it is cleared, program branches to (offset << 2) with a delay of 1 instruction.
  *  @exception None
  */
-void r300a_bgez(r3000a& cpu)
+void r3000a::op_bgez()
 {
-    int rs = cpu.get_instruction().i_type.rs;
-    std::uint32_t offset = cpu.get_instruction().i_type.imm & 0x0000FFFF;
+    int rs = instruction.i_type.rs;
+    std::uint32_t offset = instruction.i_type.imm & 0x0000FFFF;
 
-    if((cpu.read_gpr(rs) & 0x80000000) == 0){}
+    if((gpr[rs] & 0x80000000) == 0){}
         // TODO: Weird RISC delay PC...
 }
 
-void r3000a_bgezal(r3000a& cpu)
+void r3000a::op_bgezal()
 {
-    int rs = cpu.get_instruction().i_type.rs;
-    std::uint32_t offset = cpu.get_instruction().i_type.imm & 0x0000FFFF;
+    int rs = instruction.i_type.rs;
+    std::uint32_t offset = instruction.i_type.imm & 0x0000FFFF;
 
-    cpu.write_gpr(31, cpu.get_pc() + 8);
+    gpr[31] = pc + 8;
 
-    if((cpu.read_gpr(rs) & 0x80000000) == 0){}
+    if((gpr[rs] & 0x80000000) == 0){}
         // TODO: Weird RISC delay PC...
 }
 
-void r3000a_bgtz(r3000a& cpu)
+void r3000a::op_bgtz()
 {
-    int rs = cpu.get_instruction().i_type.rs;
-    std::uint32_t offset = cpu.get_instruction().i_type.imm & 0x0000FFFF;
+    int rs = instruction.i_type.rs;
+    std::uint32_t offset = instruction.i_type.imm & 0x0000FFFF;
 
-    if((cpu.read_gpr(rs) & 0x80000000) == 0 && cpu.read_gpr(rs) != 0){}
+    if((gpr[rs] & 0x80000000) == 0 && gpr[rs] != 0){}
         // TODO: Weird RISC delay PC...
 }
 
-void r3000a_blez(r3000a& cpu)
+void r3000a::op_blez()
 {
-    int rs = cpu.get_instruction().i_type.rs;
-    std::uint32_t offset = cpu.get_instruction().i_type.imm & 0x0000FFFF;
+    int rs = instruction.i_type.rs;
+    std::uint32_t offset = instruction.i_type.imm & 0x0000FFFF;
 
-    if((cpu.read_gpr(rs) & 0x80000000) && cpu.read_gpr(rs) == 0){}
+    if((gpr[rs] & 0x80000000) && gpr[rs] == 0){}
         // TODO: Weird RISC delay PC...
 }
 
-void r3000a_bltz(r3000a& cpu)
+void r3000a::op_bltz()
 {
-    int rs = cpu.get_instruction().i_type.rs;
-    std::uint32_t offset = cpu.get_instruction().i_type.imm & 0x0000FFFF;
+    int rs = instruction.i_type.rs;
+    std::uint32_t offset = instruction.i_type.imm & 0x0000FFFF;
 
-    if((cpu.read_gpr(rs) & 0x80000000)){}
+    if(gpr[rs] & 0x80000000){}
         // TODO: Weird RISC delay PC...
 }
 
-void r3000a_bltzal(r3000a& cpu)
+void r3000a::op_bltzal()
 {
 
 }
 
-void r3000a_bne(r3000a& cpu)
+void r3000a::op_bne()
 {
 
 }
 
-void r3000a_break(r3000a& cpu)
+void r3000a::op_brk()
 {
-    cpu.get_cop0()->trigger_exception(cop0::BREAKPOINT);
+    cp0->trigger_exception(cop0::BREAKPOINT);
 }
 
 ///+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -231,6 +229,9 @@ r3000a::r3000a()
 {
     cp0 = new cop0();
 
+    // Fill instruction jump table
+    ops_normal[0x00] = nullptr; // SPECIAL!
+    ops_normal[0x04] = &op_beq;
     reset();
 }
 
@@ -261,9 +262,20 @@ void r3000a::cycle()
 {
     instruction.instruction = next_instruction.instruction;
     next_instruction.instruction = cp0->virtual_read32(pc);
-    pc += 4;
 
+    std::uint32_t opcode = instruction.instruction >> 26;
     std::printf("instruction: 0x%08x\n", instruction.instruction);
+
+    if(opcode == 0)
+    {
+        (this->*ops_special[opcode])();
+    }
+    else
+    {
+        (this->*ops_normal[opcode])();
+    }
+
+    pc += 4;
 }
 
 
