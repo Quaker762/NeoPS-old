@@ -14,9 +14,17 @@
     You should have received a copy of the GNU General Public License
     along with NeoPS.  If not, see <http://www.gnu.org/licenses/>.
 **/
+#include <cstdio>
 #include "cpu/r3000a.hpp"
 
 using namespace cpu;
+
+typedef void (*operation_t)(r3000a& cpu);
+
+ const char* cpu_gpr_names[] = { "zero", "at", "v0", "v1", "a0", "a1", "a2", "a3",
+                                "t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7",
+                                "t8", "t9", "s0", "s1", "s2", "s3", "s4", "s5",
+                                "s6", "s7", "s8", "s9", "gp", "sp", "s8/fp", "ra"};
 
 ///+++++++++++++++++++STATIC CPU INSTRUCTIONS!!+++++++++++++++++++//
 
@@ -53,10 +61,9 @@ void r300a_add(r3000a& cpu)
  */
 void r300a_addi(r3000a& cpu)
 {
-    std::uint32_t imm = cpu.get_instruction().i_type.imm | 0xFFFF0000; // Sign extend WORD.
+    std::uint32_t imm = (std::int16_t)cpu.get_instruction().i_type.imm; // Sign extend immediate value by casting to int16_t
     int rt = imm = cpu.get_instruction().i_type.rt;
     int rs = imm = cpu.get_instruction().i_type.rs;
-
 
     if((cpu.read_gpr(rs) + imm) > 0x7FFFFFFF)
     {
@@ -77,7 +84,7 @@ void r300a_addi(r3000a& cpu)
  */
 void r300a_addiu(r3000a& cpu)
 {
-    std::uint32_t imm = cpu.get_instruction().i_type.imm | 0xFFFF0000; // Sign extend WORD.
+    std::uint32_t imm = (std::int16_t)cpu.get_instruction().i_type.imm;
     int rt = cpu.get_instruction().i_type.rt;
     int rs = cpu.get_instruction().i_type.rs;
 
@@ -125,7 +132,7 @@ void r300a_and(r3000a& cpu)
  */
 void r300a_andi(r3000a& cpu)
 {
-    std::uint32_t imm = cpu.get_instruction().i_type.imm; // TODO: Are bits 16-32 zeroed out?
+    std::uint32_t imm = cpu.get_instruction().i_type.imm & 0x0000FFFF; // TODO: Are bits 16-32 zeroed out?
     int rs = cpu.get_instruction().i_type.rs;
     int rt = cpu.get_instruction().i_type.rt;
 
@@ -245,6 +252,15 @@ std::uint32_t r3000a::read_gpr(unsigned reg) const
 void r3000a::write_gpr(unsigned reg, std::uint32_t value)
 {
     gpr[reg] = value;
+}
+
+void r3000a::cycle()
+{
+    instruction_t   ins;
+    operation_t     op;
+
+    ins.instruction = cp0->virtual_read32(pc); // Fetch the current instruction
+    std::printf("0x%08x", ins.instruction);
 }
 
 

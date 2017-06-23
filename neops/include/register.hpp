@@ -18,16 +18,10 @@
 #define REGISTER_HPP_INCLUDED
 
 /**< CPU Register names (NOT Aliases) */
-const char* cpu_gpr_names[] = { "zero", "at", "v0", "v1", "a0", "a1", "a2", "a3",
-                                "t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7",
-                                "t8", "t9", "s0", "s1", "s2", "s3", "s4", "s5",
-                                "s6", "s7", "s8", "s9", "gp", "sp", "s8/fp", "ra"};
+extern const char* cpu_gpr_names[];
 
 /**< CoProcessor 0 (MMU) Register names (NOT Aliases) */
-const char* cp0_gpr_names[] = { "indx", "rand", "tlbl", "bpc", "ctxt", "bda", "pidmask", "dcic",
-                                "badv", "bdam", "tlbh", "bpcm", "sr", "cause", "epc", "prid"
-                                "erreg", "cop0r17", "cop0r18", "cop0r19", "cop0r20", "cop0r21", "cop0r22", "cop0r23"
-                                "cop0r24", "cop0r25", "cop0r26", "cop0r27", "cop0r28", "cop0r29", "cop0r30", "cop0r31"};
+extern const char* cp0_gpr_names[];
 
 /**
  *  A 32-bit register.

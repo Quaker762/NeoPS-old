@@ -30,6 +30,7 @@
 *.exe
 *.out
 *.app
+*.bin
 
 # Code::Blocks crap
 *.layout

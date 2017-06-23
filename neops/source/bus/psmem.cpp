@@ -14,12 +14,15 @@
     You should have received a copy of the GNU General Public License
     along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 **/
-#include "bus/psmem.hpp"
-
 #include <cassert>
+
+#include "bus/psmem.hpp"
+#include "bios.hpp"
 
 static std::uint8_t* kuseg = nullptr;
 
+// IMPORTANT FUCKIN NOTE!!!!
+// ALL ADDRESSES ARE PHYSICAL!
 void mem::psmem_init()
 {
     assert(kuseg == nullptr);
@@ -37,21 +40,27 @@ void mem::psmem_destroy()
 
 std::uint8_t mem::read_byte(std::uint32_t addr)
 {
-    return kuseg[addr];
+    if(addr >= PSX_BIOS_SEGMENT_PHYS && addr < PSX_BIOS_SEGMENT_PHYS + PSX_BIOS_SIZE)
+        return bios::read_byte(addr - PSX_BIOS_SEGMENT_PHYS);
+
+    std::printf("fatal: invalid read8 of physical address: 0x%08x", addr);
+    exit(-1);
 }
 
 std::uint16_t mem::read_hword(std::uint32_t addr)
 {
-    std::uint16_t ret = 0;
+    if(addr >= PSX_BIOS_SEGMENT_PHYS && addr < PSX_BIOS_SEGMENT_PHYS + PSX_BIOS_SIZE)
+        return bios::read_hword(addr - PSX_BIOS_SEGMENT_PHYS);
 
-    ret = (kuseg[addr + 1] << 8) | kuseg[addr];
-    return ret;
+    std::printf("fatal: invalid read16 of physical address: 0x%08x", addr);
+    exit(-1);
 }
 
 std::uint32_t mem::read_word(std::uint32_t addr)
 {
-    std::uint16_t ret = 0;
+    if(addr >= PSX_BIOS_SEGMENT_PHYS && addr < PSX_BIOS_SEGMENT_PHYS + PSX_BIOS_SIZE)
+        return bios::read_word(addr - PSX_BIOS_SEGMENT_PHYS);
 
-    ret = (kuseg[addr + 3] << 24) | (kuseg[addr + 3] << 16) | (kuseg[addr] << 8) | kuseg[addr];
-    return ret;
+    std::printf("fatal: invalid read32 of physical address: 0x%08x", addr);
+    exit(-1);
 }

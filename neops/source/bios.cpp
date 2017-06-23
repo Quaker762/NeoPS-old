@@ -69,8 +69,8 @@ std::uint16_t bios::read_hword(std::uint32_t addr)
 
 std::uint32_t bios::read_word(std::uint32_t addr)
 {
-    std::uint16_t ret = 0;
+    std::uint32_t ret = 0;
 
-    ret = (bseg[addr + 3] << 24) | (bseg[addr + 3] << 16) | (bseg[addr] << 8) | bseg[addr];
+    ret = (bseg[addr + 3] << 24) | (bseg[addr + 2] << 16) | (bseg[addr + 1] << 8) | bseg[addr];
     return ret;
 }
