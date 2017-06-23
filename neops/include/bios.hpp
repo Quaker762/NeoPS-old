@@ -19,7 +19,8 @@
 
 #include <string>
 
-#define PSX_BIOS_SIZE 0x80000
+#define PSX_BIOS_SEGMENT_PHYS   0x1fc00000
+#define PSX_BIOS_SIZE           0x00080000
 
 namespace bios
 {
