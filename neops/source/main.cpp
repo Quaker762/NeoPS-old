@@ -10,5 +10,7 @@ int main()
     bios::load_bios("bios/SCPH1001.bin");
     cpu::r3000a cpu;
 
+    cpu.cycle();
+    cpu.cycle();
     return 0;
 }

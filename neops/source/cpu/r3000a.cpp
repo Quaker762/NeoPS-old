@@ -230,6 +230,8 @@ void r3000a_break(r3000a& cpu)
 r3000a::r3000a()
 {
     cp0 = new cop0();
+
+    reset();
 }
 
 r3000a::~r3000a()
@@ -242,6 +244,7 @@ void r3000a::reset()
     //cp0->write_gpr();
 
     pc = 0xbfc00000; // BIOS location.
+    next_instruction.instruction = 0x00;
 }
 
 std::uint32_t r3000a::read_gpr(unsigned reg) const
@@ -256,11 +259,11 @@ void r3000a::write_gpr(unsigned reg, std::uint32_t value)
 
 void r3000a::cycle()
 {
-    instruction_t   ins;
-    operation_t     op;
+    instruction.instruction = next_instruction.instruction;
+    next_instruction.instruction = cp0->virtual_read32(pc);
+    pc += 4;
 
-    ins.instruction = cp0->virtual_read32(pc); // Fetch the current instruction
-    std::printf("0x%08x", ins.instruction);
+    std::printf("instruction: 0x%08x\n", instruction.instruction);
 }
 
 

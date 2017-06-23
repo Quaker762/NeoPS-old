@@ -94,10 +94,14 @@ namespace cpu
         //cop2*           co2; /**< Our CPU's cop2. */
         std::uint32_t   gpr[R3000_GPR_MAX]; /**< Our General Purprose Registers. */
 
-        std::uint64_t   hi; /**< Multiplication 64 bit high result or division  remainder. */
-        std::uint64_t   lo; /**< Multiplication 64 bit low result or division quotient. */
-        std::uint32_t   pc; /**< Program Counter. */
-        instruction_t   instruction; /**< Current instruction. */
+        std::uint64_t   hi;             /**< Multiplication 64 bit high result or division  remainder. */
+        std::uint64_t   lo;             /**< Multiplication 64 bit low result or division quotient. */
+        std::uint32_t   pc;             /**< Program Counter. */
+        std::uint32_t   delay_pc;       /**< Instruction delay PC (of previous instruction)*/
+        instruction_t   instruction;    /**< Current instruction. */
+        instruction_t   next_instruction; /**< Branch delay emulation */
+
+        bool            has_branched;   /**< Has execution branched/jumped? */
     };
 }
 
