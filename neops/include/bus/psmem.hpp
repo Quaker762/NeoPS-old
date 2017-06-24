@@ -20,6 +20,11 @@
 #include <cstdint>
 
 #define PSX_MEM_SIZE 0x200000
+#define PSX_MEM_CONTROL_BASE    0x1f801000
+#define PSX_MEM_CONTROL_END     0x1f801020
+
+#define PSX_MEM_RAM_SIZE_REG    0x1f801060
+#define PSX_CACHE_CTRL_REG      0xfffe0130
 
 /**
  *  Memory and hardware bus.
@@ -59,6 +64,10 @@ namespace mem
      */
     void psmem_destroy();
 
+    void write_byte(std::uint32_t addr, std::uint8_t val);
+    void write_hword(std::uint32_t addr, std::uint16_t val);
+    void write_word(std::uint32_t addr, std::uint32_t val);
+
     /**
      *  Read an 8-bit value from address addr
      *
@@ -82,6 +91,14 @@ namespace mem
      *  @return Word from memory.
      */
     std::uint32_t   read_word(std::uint32_t addr);
+
+    /**
+     *  Write to a memory control register (which is technically memory mapped IO, but it's here for fun!)
+     *
+     *  @arg reg - Register address we want to write to.
+     *  @arg val - Value we want to write.
+     */
+    void write_creg(std::uint32_t reg, std::uint32_t value);
 }
 
 #endif // PSMEM_HPP_INCLUDED

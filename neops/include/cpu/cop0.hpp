@@ -80,7 +80,7 @@ namespace cpu
          *  @arg reg - Register number we want to write to. Encoded in operation.
          *  @arg value - Value we want to write.
          */
-        void write_gpr(unsigned reg, uint32_t value);
+        void write_gpr(unsigned reg, std::uint32_t value);
 
         /**
          *  Read a value from a general purpose register.
@@ -90,6 +90,30 @@ namespace cpu
         std::uint32_t read_gpr(unsigned reg);
 
         void trigger_exception(EXCEPTION_TYPE ex);
+
+        /**
+         *  Write a byte to memory given a virtual address.
+         *
+         *  @param vaddr - Virtual address.
+         *  @param val - Value to write to memory.
+         */
+         void           virtual_write8(std::uint32_t vaddr, std::uint8_t value);
+
+        /**
+         *  Write a half word to memory given a virtual address.
+         *
+         *  @param vaddr - Virtual address.
+         *  @param val - Value to write to memory.
+         */
+         void           virtual_write16(std::uint32_t vaddr, std::uint16_t value);
+
+        /**
+         *  Write a word to memory given a virtual address.
+         *
+         *  @param vaddr - Virtual address.
+         *  @param val - Value to write to memory.
+         */
+         void           virtual_write32(std::uint32_t vaddr, std::uint32_t value);
 
         /**
          *  Read a byte from memory given a 32-bit virtual address.

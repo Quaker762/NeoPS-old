@@ -1,73 +1,79 @@
 # depslib dependency file v1.0
-1498232318 source:e:\users\jesse\documents\emu\neops\neops\source\main.cpp
+1498390754 source:e:\users\jesse\documents\emu\neops\neops\source\main.cpp
 	<iostream>
 	"bus/psmem.hpp"
-	"bios.hpp"
+	"bios/bios.hpp"
 	"cpu/r3000a.hpp"
 
-1498233060 source:e:\users\jesse\documents\emu\neops\neops\source\cpu\cop0.cpp
+1498396007 source:e:\users\jesse\documents\emu\neops\neops\source\cpu\cop0.cpp
 	<cstdio>
 	<cstdlib>
 	"cpu/cop0.hpp"
 	"bus/psmem.hpp"
-
-1498205152 e:\users\jesse\documents\emu\neops\neops\include\cpu\cop0.hpp
-	<cstdint>
-
-1498232416 source:e:\users\jesse\documents\emu\neops\neops\source\cpu\r3000a.cpp
-	<cstdio>
-	"cpu/r3000a.hpp"
-
-1498234514 e:\users\jesse\documents\emu\neops\neops\include\cpu\r3000a.hpp
-	<cstdint>
 	"register.hpp"
+
+1498395322 e:\users\jesse\documents\emu\neops\neops\include\cpu\cop0.hpp
+	<cstdint>
+
+1498398391 source:e:\users\jesse\documents\emu\neops\neops\source\cpu\r3000a.cpp
+	<cstdio>
+	<cstdlib>
+	<cstring>
+	"cpu/r3000a.hpp"
+	"register.hpp"
+
+1498396014 e:\users\jesse\documents\emu\neops\neops\include\cpu\r3000a.hpp
+	<cstdint>
 	"cpu/cop0.hpp"
 	"instruction.hpp"
 
-1498232285 e:\users\jesse\documents\emu\neops\neops\include\register.hpp
+1498396003 e:\users\jesse\documents\emu\neops\neops\include\register.hpp
 
-1498237770 source:c:\users\quaker\documents\mosaic software\neops\neops\source\cpu\r3000a.cpp
+1498408963 source:c:\users\quaker\documents\mosaic software\neops\neops\source\cpu\r3000a.cpp
 	<cstdio>
+	<cstdlib>
+	<cstring>
 	"cpu/r3000a.hpp"
-
-1498238376 c:\users\quaker\documents\mosaic software\neops\neops\include\cpu\r3000a.hpp
-	<cstdint>
 	"register.hpp"
+
+1498407882 c:\users\quaker\documents\mosaic software\neops\neops\include\cpu\r3000a.hpp
+	<cstdint>
 	"cpu/cop0.hpp"
 	"instruction.hpp"
 
 1498235871 c:\users\quaker\documents\mosaic software\neops\neops\include\register.hpp
 
-1498235871 c:\users\quaker\documents\mosaic software\neops\neops\include\cpu\cop0.hpp
+1498399765 c:\users\quaker\documents\mosaic software\neops\neops\include\cpu\cop0.hpp
 	<cstdint>
 
-1498235871 source:c:\users\quaker\documents\mosaic software\neops\neops\source\main.cpp
+1498399765 source:c:\users\quaker\documents\mosaic software\neops\neops\source\main.cpp
 	<iostream>
 	"bus/psmem.hpp"
-	"bios.hpp"
+	"bios/bios.hpp"
 	"cpu/r3000a.hpp"
 
-1498235871 source:c:\users\quaker\documents\mosaic software\neops\neops\source\cpu\cop0.cpp
+1498403880 source:c:\users\quaker\documents\mosaic software\neops\neops\source\cpu\cop0.cpp
 	<cstdio>
 	<cstdlib>
 	"cpu/cop0.hpp"
 	"bus/psmem.hpp"
+	"register.hpp"
 
-1498232285 source:e:\users\jesse\documents\emu\neops\neops\source\bus\psmem.cpp
+1498391692 source:e:\users\jesse\documents\emu\neops\neops\source\bus\psmem.cpp
 	<cassert>
 	"bus/psmem.hpp"
-	"bios.hpp"
+	"bios/bios.hpp"
 
-1498205152 e:\users\jesse\documents\emu\neops\neops\include\bus\psmem.hpp
+1498390853 e:\users\jesse\documents\emu\neops\neops\include\bus\psmem.hpp
 	<cstdint>
 
-1498232285 source:e:\users\jesse\documents\emu\neops\neops\source\bios.cpp
+1498294121 source:e:\users\jesse\documents\emu\neops\neops\source\bios.cpp
 	"bios.hpp"
 	<fstream>
 	<cassert>
 	<cstdio>
 
-1498232285 e:\users\jesse\documents\emu\neops\neops\include\bios.hpp
+1498294731 e:\users\jesse\documents\emu\neops\neops\include\bios.hpp
 	<string>
 
 1498205152 e:\users\jesse\documents\emu\neops\neops\include\instruction.hpp
@@ -82,14 +88,32 @@
 1498235871 c:\users\quaker\documents\mosaic software\neops\neops\include\bios.hpp
 	<string>
 
-1498235871 source:c:\users\quaker\documents\mosaic software\neops\neops\source\bus\psmem.cpp
+1498407606 source:c:\users\quaker\documents\mosaic software\neops\neops\source\bus\psmem.cpp
 	<cassert>
 	"bus/psmem.hpp"
-	"bios.hpp"
+	"bios/bios.hpp"
 
-1498235871 c:\users\quaker\documents\mosaic software\neops\neops\include\bus\psmem.hpp
+1498399765 c:\users\quaker\documents\mosaic software\neops\neops\include\bus\psmem.hpp
 	<cstdint>
 
 1498235871 c:\users\quaker\documents\mosaic software\neops\neops\include\instruction.hpp
 	<cstdint>
+
+1498390333 source:e:\users\jesse\documents\emu\neops\neops\source\bios\bios.cpp
+	"bios/bios.hpp"
+	<fstream>
+	<cassert>
+	<cstdio>
+
+1498390833 e:\users\jesse\documents\emu\neops\neops\include\bios\bios.hpp
+	<string>
+
+1498399765 source:c:\users\quaker\documents\mosaic software\neops\neops\source\bios\bios.cpp
+	"bios/bios.hpp"
+	<fstream>
+	<cassert>
+	<cstdio>
+
+1498399765 c:\users\quaker\documents\mosaic software\neops\neops\include\bios\bios.hpp
+	<string>
 

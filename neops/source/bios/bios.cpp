@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with NeoPS.  If not, see <http://www.gnu.org/licenses/>.
 **/
-#include "bios.hpp"
+#include "bios/bios.hpp"
 
 #include <fstream>
 #include <cassert>
