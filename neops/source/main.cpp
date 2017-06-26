@@ -1,5 +1,5 @@
 #include <iostream>
-#include "bus/psmem.hpp"
+#include "bus/bus.hpp"
 #include "bios/bios.hpp"
 #include "cpu/r3000a.hpp"
 

@@ -17,8 +17,9 @@
 #include <cassert>
 #include <cstring>
 
-#include "bus/psmem.hpp"
+#include "bus/bus.hpp"
 #include "bios/bios.hpp"
+#include "spu/spu.hpp"
 
 static std::uint32_t mem_size;          /**< Memory size register. Usually 0x00000b88 */
 static std::uint32_t mem_creg[10];      /**< Our memory control registers **/
@@ -57,6 +58,12 @@ void mem::write_hword(std::uint32_t addr, std::uint16_t val)
 {
     std::printf("warning: attempt to write to physical address 0x%08x with val 0x%04x\n", addr, val);
 
+    if(addr >= PSX_SPU_CREG_START && addr <= PSX_SPU_CREG_END)
+    {
+        spu::write_creg(addr, val);
+        return;
+    }
+
     kuseg[addr + 0] = val & 0xff;
     kuseg[addr + 1] = (val >> 8) & 0xff;
     exit(-1);
@@ -93,7 +100,7 @@ void mem::write_word(std::uint32_t addr, std::uint32_t val)
 
 std::uint8_t mem::read_byte(std::uint32_t addr)
 {
-    if(addr >= PSX_BIOS_SEGMENT_PHYS && addr < PSX_BIOS_SEGMENT_PHYS + PSX_BIOS_SIZE)
+    if(addr >= PSX_BIOS_SEGMENT_PHYS && addr <= PSX_BIOS_SEGMENT_PHYS + PSX_BIOS_SIZE)
         return bios::read_byte(addr - PSX_BIOS_SEGMENT_PHYS);
 
     std::printf("fatal: invalid read8 of physical address: 0x%08x\n", addr);

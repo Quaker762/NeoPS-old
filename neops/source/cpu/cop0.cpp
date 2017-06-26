@@ -18,7 +18,7 @@
 #include <cstdlib>
 
 #include "cpu/cop0.hpp"
-#include "bus/psmem.hpp"
+#include "bus/bus.hpp"
 #include "register.hpp"
 
 #define KSEG0 0b100
