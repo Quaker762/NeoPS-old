@@ -22,6 +22,7 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-march=i686" />
 					<Add option="-O2" />
 				</Compiler>
 				<Linker>
@@ -42,13 +43,13 @@
 		<Linker>
 			<Add option="-m32" />
 		</Linker>
-		<Unit filename="neops/include/bios.hpp" />
+		<Unit filename="neops/include/bios/bios.hpp" />
 		<Unit filename="neops/include/bus/psmem.hpp" />
 		<Unit filename="neops/include/cpu/cop0.hpp" />
 		<Unit filename="neops/include/cpu/r3000a.hpp" />
 		<Unit filename="neops/include/instruction.hpp" />
 		<Unit filename="neops/include/register.hpp" />
-		<Unit filename="neops/source/bios.cpp" />
+		<Unit filename="neops/source/bios/bios.cpp" />
 		<Unit filename="neops/source/bus/psmem.cpp" />
 		<Unit filename="neops/source/cpu/cop0.cpp" />
 		<Unit filename="neops/source/cpu/r3000a.cpp" />
