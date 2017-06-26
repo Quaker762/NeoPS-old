@@ -28,6 +28,10 @@ const char* cpu_gpr_names[] = { "zero", "at", "v0", "v1", "a0", "a1", "a2", "a3"
                                 "t8", "t9", "s0", "s1", "s2", "s3", "s4", "s5",
                                 "s6", "s7", "s8", "s9", "gp", "sp", "s8/fp", "ra"};
 
+static inline uint32_t overflow(uint32_t x, uint32_t y, uint32_t z)
+{
+    return (~(x ^ y) & (x ^ z) & 0x80000000);
+}
 ///+++++++++++++++++++STATIC CPU INSTRUCTIONS!!+++++++++++++++++++//
 
 /**
@@ -40,17 +44,18 @@ const char* cpu_gpr_names[] = { "zero", "at", "v0", "v1", "a0", "a1", "a2", "a3"
  */
 void r3000a::op_addi()
 {
-    std::int32_t imm = (std::int32_t)instruction.i_type.imm; // Sign extend immediate value by casting to int16_t
+    std::int32_t imm = (std::int16_t)instruction.i_type.imm; // Sign extend immediate value by casting to int16_t
     int rt = instruction.i_type.rt;
     int rs = instruction.i_type.rs;
 
-    std::uint32_t val = (std::uint32_t)(gpr[rs] + imm);
+    std::int32_t rs_val = (std::int32_t)gpr[rs];
+    std::uint32_t val = (std::int32_t)rs_val + (std::int32_t)imm;
 
-    if(val > 0x7fffffff)
+    if(overflow(rs_val, imm, val))
     {
         cp0->trigger_exception(cop0::ARITHMETIC_OVERFLOW);
         std::printf("fatal: ADDI overflow!\n");
-        //exit(-1);
+        exit(-1);
         return; // Addition does NOT occur!
     }
 
@@ -67,24 +72,12 @@ void r3000a::op_addi()
  */
 void r3000a::op_addiu()
 {
-    std::int32_t imm = (std::int32_t)instruction.i_type.imm;
+    std::uint32_t imm = (std::int16_t)instruction.i_type.imm;
     int rt = instruction.i_type.rt;
     int rs = instruction.i_type.rs;
 
-    write_gpr(rt, (std::int32_t)(gpr[rs] + imm));
-}
-
-/**
- *  Add Unsigned Word.
- *
- *  Format: ADDU rd, rs, rt.
- *  Add two 32-bit values and produce a 32-bit result; arithmetic overflow is ignored (does not cause an exception)..
- *
- *  @exception Under no circumstance should an overflow exception be triggered!
- */
-void r3000a::op_addu()
-{
-
+    std::printf("addiu: val = 0x%08x(%d)\n", (std::int16_t)imm, (std::int16_t)imm);
+    write_gpr(rt, gpr[rs] + imm);
 }
 
 /**
@@ -185,17 +178,37 @@ void r3000a::op_ori()
     write_gpr(rt, gpr[rs] | imm);
 }
 
+void r3000a::op_sh()
+{
+    std::uint32_t base = instruction.i_type.rs;
+    std::uint32_t rt = instruction.i_type.rt;
+    std::uint32_t offset = (std::int16_t)(instruction.i_type.imm);
+
+    std::uint32_t vaddr = (std::int32_t)(gpr[base] + offset);
+    cp0->virtual_write16(vaddr, gpr[rt]);
+}
+
 void r3000a::op_sw()
 {
     std::uint32_t base = instruction.i_type.rs;
     std::uint32_t rt = instruction.i_type.rt;
-    std::uint32_t offset = (std::int16_t)(instruction.i_type.imm & 0xffff);
+    std::uint32_t offset = (std::int16_t)(instruction.i_type.imm);
 
     std::uint32_t vaddr = (std::int32_t)(gpr[base] + offset);
     cp0->virtual_write32(vaddr, gpr[rt]);
 }
 
 // SPECIAL OPERATIONS
+
+void r3000a::op_addu()
+{
+    int rs = instruction.r_type.rs;
+    int rt = instruction.r_type.rt;
+    int rd = instruction.r_type.rd;
+
+    write_gpr(rd, gpr[rs] + gpr[rt]);
+}
+
 void r3000a::op_or()
 {
     int rd = instruction.r_type.rd;
@@ -221,7 +234,9 @@ void r3000a::op_sltu()
     int rs = instruction.r_type.rs;
 
     if(gpr[rs] < gpr[rt])
-        write_gpr(rd, (std::uint32_t)0x00000001);
+        write_gpr(rd, 0x00000001);
+    else
+        write_gpr(rd, 0x00000000);
 }
 
 ///+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -237,18 +252,6 @@ r3000a::r3000a()
     }
 
     // Fill instruction jump table
-//    ops_normal[0x02] = &op_j;
-//    ops_normal[0x05] = &op_bne;
-//    ops_normal[0x08] = &op_addi;
-//    ops_normal[0x09] = &op_addiu;
-//    ops_normal[0x10] = &op_ctc0;
-//    ops_normal[0x0d] = &op_ori;
-//    ops_normal[0x0f] = &op_lui;
-//    ops_normal[0x2b] = &op_sw;
-//
-//    ops_special[0x00] = &op_sll;
-//    ops_special[0x25] = &op_or;
-
     ops_normal[0x02] = &op_j;
     ops_normal[0x05] = &op_bne;
     ops_normal[0x08] = &op_addi;
@@ -257,12 +260,15 @@ r3000a::r3000a()
     ops_normal[0x0f] = &op_lui;
     ops_normal[0x10] = &op_ctc0;
     ops_normal[0x23] = &op_lw;
+    ops_normal[0x29] = &op_sh;
     ops_normal[0x2b] = &op_sw;
 
 
     ops_special[0x00] = &op_sll;
+    ops_special[0x21] = &op_addu;
     ops_special[0x25] = &op_or;
     ops_special[0x2b] = &op_sltu;
+
     reset();
 }
 
@@ -305,7 +311,7 @@ void r3000a::cycle()
         std::uint32_t opcode_s = instruction.instruction & 0x3f;
         if(ops_special[opcode_s] == nullptr)
         {
-            printf("fatal: unhandled special instruction 0x%08x! Opcode: 0x%02x\n", instruction.instruction, opcode_s);
+            std::printf("fatal: unhandled special instruction 0x%08x! Opcode: 0x%02x\n", instruction.instruction, opcode_s);
             exit(-1);
         }
 
@@ -315,7 +321,7 @@ void r3000a::cycle()
     {
         if(ops_normal[opcode] == nullptr)
         {
-            printf("fatal: unhandled instruction 0x%08x! Opcode: 0x%02x\n", instruction.instruction, opcode);
+            std::printf("fatal: unhandled instruction 0x%08x! Opcode: 0x%02x\n", instruction.instruction, opcode);
             exit(-1);
         }
 

@@ -19,12 +19,15 @@
 
 #include <cstdint>
 
-#define PSX_MEM_SIZE 0x200000
+#define PSX_KUSEG_SIZE          0x001fffff
+#define PSX_MEM_SIZE            0x200000
+
 #define PSX_MEM_CONTROL_BASE    0x1f801000
 #define PSX_MEM_CONTROL_END     0x1f801020
 
 #define PSX_MEM_RAM_SIZE_REG    0x1f801060
 #define PSX_CACHE_CTRL_REG      0xfffe0130
+
 
 /**
  *  Memory and hardware bus.

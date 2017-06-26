@@ -96,7 +96,6 @@ namespace cpu
         void op_add();
         void op_addi();
         void op_addiu();
-        void op_addu();
         void op_op_and();
         void op_andi();
         void op_beq();
@@ -117,10 +116,11 @@ namespace cpu
         void op_lui();
         void op_lw();
         void op_ori();
+        void op_sh();
         void op_sw();
 
         // SPECIAL INSTRUCTIONS
-
+        void op_addu();
         void op_or();
         void op_sll();
         void op_sltu();

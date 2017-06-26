@@ -36,8 +36,14 @@ const char* cp0_gpr_names[] = { "indx", "rand", "tlbl", "bpc", "ctxt", "bda", "p
 
 static inline bool align_check(std::uint32_t addr)
 {
-    return addr % 4 == 0;
+    return addr % 4 == 0 || addr % 2 == 0;
 }
+
+static std::uint32_t address_masks[] =  {0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, // kuseg
+                                         0x7fffffff, // kseg0
+                                         0x1fffffff, // kseg1
+                                         0xffffffff, 0xffffffff
+                                        };
 
 using namespace cpu;
 
@@ -82,7 +88,11 @@ void cop0::virtual_write16(std::uint32_t vaddr, std::uint16_t value)
         exit(-1);
     }
 
-    mem::write_hword(vaddr, value);
+    int segment = vaddr >> 29;
+    std::uint32_t phys_addr = vaddr & address_masks[segment];
+
+
+    mem::write_hword(phys_addr, value);
 }
 
 void cop0::virtual_write32(std::uint32_t vaddr, std::uint32_t value)
@@ -95,15 +105,9 @@ void cop0::virtual_write32(std::uint32_t vaddr, std::uint32_t value)
     }
 
     int segment = vaddr >> 29;
+    std::uint32_t phys_addr = vaddr & address_masks[segment];
 
-    if(segment == KSEG0) // This virtual address is mapped to KSEG0
-        mem::write_word(vaddr - KSEG0_MASK, value);
-    else if(segment == KSEG1)  // This virtual address is mapped to KESG1
-        mem::write_word(vaddr - KSEG1_MASK, value);
-    else if(segment == KSEG2)
-        std::printf("warning: io memory registers not yet implemented! value: 0x%08x\n", vaddr);
-
-    mem::write_word(vaddr, value);
+    mem::write_word(phys_addr, value);
 }
 
 // TODO: Caching???
@@ -116,15 +120,9 @@ std::uint8_t cop0::virtual_read8(std::uint32_t vaddr)
     }
 
     int segment = vaddr >> 29;
+    std::uint32_t phys_addr = vaddr & address_masks[segment];
 
-    if(segment == KSEG0) // This virtual address is mapped to KSEG0
-        return mem::read_byte(vaddr - KSEG0_MASK);
-    else if(segment == KSEG1)  // This virtual address is mapped to KESG1
-        return mem::read_byte(vaddr - KSEG1_MASK);
-    else if(segment == KSEG2)
-        std::printf("warning: io memory registers not yet implemented! value: 0x%08x\n", vaddr);
-
-    return mem::read_byte(vaddr);
+    return mem::read_byte(phys_addr);
 }
 
 // TODO: Caching???
@@ -137,13 +135,9 @@ std::uint16_t cop0::virtual_read16(std::uint32_t vaddr)
     }
 
     int segment = vaddr >> 29;
+    std::uint32_t phys_addr = vaddr & address_masks[segment];
 
-    if(segment == KSEG0) // This virtual address is mapped to KSEG0
-        return mem::read_hword(vaddr - KSEG0_MASK);
-    else if(segment == KSEG1)  // This virtual address is mapped to KESG1
-        return mem::read_hword(vaddr - KSEG1_MASK);
-    else if(segment == KSEG2)
-        std::printf("warning: io memory registers not yet implemented! value: 0x%08x\n", vaddr);
+    return mem::read_hword(phys_addr);
 }
 
 // TODO: Caching???
@@ -156,13 +150,7 @@ std::uint32_t cop0::virtual_read32(std::uint32_t vaddr)
     }
 
     int segment = vaddr >> 29;
+    std::uint32_t phys_addr = vaddr & address_masks[segment];
 
-    if(segment == KSEG0) // This virtual address is mapped to KSEG0
-        return mem::read_word(vaddr - KSEG0_MASK);
-    else if(segment == KSEG1)  // This virtual address is mapped to KESG1
-        return mem::read_word(vaddr - KSEG1_MASK);
-    else if(segment == KSEG2)
-        std::printf("warning: io memory registers not yet implemented! value: 0x%08x\n", vaddr);
-
-    return mem::read_word(vaddr);
+    return mem::read_word(phys_addr);
 }

@@ -15,6 +15,7 @@
     along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 **/
 #include <cassert>
+#include <cstring>
 
 #include "bus/psmem.hpp"
 #include "bios/bios.hpp"
@@ -31,6 +32,7 @@ void mem::psmem_init()
 {
     assert(kuseg == nullptr);
     kuseg = new std::uint8_t[PSX_MEM_SIZE];
+    std::memset(kuseg, 0xba, sizeof(kuseg));
 }
 
 void mem::psmem_destroy()
@@ -54,17 +56,39 @@ void mem::write_byte(std::uint32_t addr, std::uint8_t val)
 void mem::write_hword(std::uint32_t addr, std::uint16_t val)
 {
     std::printf("warning: attempt to write to physical address 0x%08x with val 0x%04x\n", addr, val);
+
+    kuseg[addr + 0] = val & 0xff;
+    kuseg[addr + 1] = (val >> 8) & 0xff;
+    exit(-1);
 }
 
 void mem::write_word(std::uint32_t addr, std::uint32_t val)
 {
     if(addr >= PSX_MEM_CONTROL_BASE && addr <= PSX_MEM_CONTROL_END)
+    {
         write_creg(addr, val);
+        return;
+    }
+
 
     if(addr == PSX_MEM_RAM_SIZE_REG)
+    {
         mem_size = val;
+        return;
+    }
+
+    if(addr == PSX_CACHE_CTRL_REG)
+    {
+        std::printf("warning: attempt to write cache control with value: 0x%08x!\n", val);
+        return;
+    }
 
     std::printf("warning: attempt to write to physical address 0x%08x with val 0x%08x\n", addr, val);
+
+    kuseg[addr + 0] = val & 0xff;
+    kuseg[addr + 1] = (val >> 8) & 0xff;
+    kuseg[addr + 2] = (val >> 16) & 0xff;
+    kuseg[addr + 3] = (val >> 24) & 0xff;
 }
 
 std::uint8_t mem::read_byte(std::uint32_t addr)
@@ -91,5 +115,5 @@ std::uint32_t mem::read_word(std::uint32_t addr)
     if(addr >= PSX_MEM_CONTROL_BASE && addr <= PSX_MEM_CONTROL_END)
         return mem_creg[addr];
 
-    std::printf("fatal: invalid read32 of physical address: 0x%08x\n", addr);
+    return kuseg[addr + 0] | (kuseg[addr + 1] << 8) | (kuseg[addr + 2] << 16) | (kuseg[addr + 3] << 24);
 }
