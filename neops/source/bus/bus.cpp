@@ -52,6 +52,7 @@ void mem::write_creg(std::uint32_t reg, std::uint32_t val)
 void mem::write_byte(std::uint32_t addr, std::uint8_t val)
 {
     std::printf("warning: attempt to write to physical address 0x%08x with val 0x%02x\n", addr, val);
+    exit(-1);
 }
 
 void mem::write_hword(std::uint32_t addr, std::uint16_t val)

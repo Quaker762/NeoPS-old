@@ -69,13 +69,6 @@ void cop0::write_gpr(unsigned reg, std::uint32_t val)
 
 void cop0::virtual_write8(std::uint32_t vaddr, std::uint8_t value)
 {
-    // TODO: BUS ERROR TRIGGER
-    if(!align_check(vaddr))
-    {
-        std::printf("fatal: attempt to write from unaligned memory address! (SIGBUS)\n");;
-        exit(-1);
-    }
-
     mem::write_byte(vaddr, value);
 }
 

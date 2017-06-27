@@ -88,7 +88,7 @@ void r3000a::op_addiu()
  *  The result is placed into general register rd.
  *  @exception None
  */
-void r3000a::op_op_and()
+void r3000a::op_and()
 {
     int rs = instruction.r_type.rs;
     int rt = instruction.r_type.rt;
@@ -123,9 +123,11 @@ void r3000a::op_bne()
     if(gpr[rs] != gpr[rt])
     {
         std::printf("bne: gpr[rs] != gpr[rt]! setting pc to: 0x%08x\n", pc + target - 4);
-        pc += target;
-        pc -= 4;
+        next_pc += target;
+        next_pc -= 4;
     }
+
+    is_branch = true;
 }
 
 void r3000a::op_brk()
@@ -146,7 +148,18 @@ void r3000a::op_j()
 {
     std::uint32_t addr = instruction.j_type.target;
 
-    pc = (pc & 0xf0000000) | (addr << 2);
+    next_pc = (pc & 0xf0000000) | (addr << 2);
+    is_branch = true;
+    std::printf("warning: jump called with address 0x%08x! Next instruction at 0x%08x\n", addr << 2, pc);
+}
+
+void r3000a::op_jal()
+{
+    std::uint32_t addr = instruction.j_type.target;
+
+    next_pc = (pc & 0xf0000000) | (addr << 2);
+    write_gpr(31, pc + 8);
+    is_branch = true;
     std::printf("warning: jump called with address 0x%08x! Next instruction at 0x%08x\n", addr << 2, pc);
 }
 
@@ -186,6 +199,16 @@ void r3000a::op_sh()
 
     std::uint32_t vaddr = (std::int32_t)(gpr[base] + offset);
     cp0->virtual_write16(vaddr, gpr[rt]);
+}
+
+void r3000a::op_sb()
+{
+    std::uint32_t base = instruction.i_type.rs;
+    std::uint32_t rt = instruction.i_type.rt;
+    std::uint32_t offset = (std::int16_t)(instruction.i_type.imm);
+
+    std::uint32_t vaddr = (std::int32_t)(gpr[base] + offset);
+    cp0->virtual_write8(vaddr, gpr[rt]);
 }
 
 void r3000a::op_sw()
@@ -253,13 +276,16 @@ r3000a::r3000a()
 
     // Fill instruction jump table
     ops_normal[0x02] = &op_j;
+    ops_normal[0x03] = &op_jal;
     ops_normal[0x05] = &op_bne;
     ops_normal[0x08] = &op_addi;
     ops_normal[0x09] = &op_addiu;
+    ops_normal[0x0c] = &op_andi;
     ops_normal[0x0d] = &op_ori;
     ops_normal[0x0f] = &op_lui;
     ops_normal[0x10] = &op_ctc0;
     ops_normal[0x23] = &op_lw;
+    ops_normal[0x28] = &op_sb;
     ops_normal[0x29] = &op_sh;
     ops_normal[0x2b] = &op_sw;
 
@@ -282,7 +308,9 @@ void r3000a::reset()
     //cp0->write_gpr();
 
     pc = 0xbfc00000; // BIOS location.
-    next_instruction.instruction = 0x00;
+    next_pc = pc + 4;
+    is_branch = false;
+    delay_slot = false;
     std::memset(gpr, 0x00, sizeof(gpr));
     std::memset(gpr_delay, 0x00, sizeof(gpr_delay));
 }
@@ -299,12 +327,15 @@ void r3000a::write_gpr(unsigned reg, std::uint32_t value)
 
 void r3000a::cycle()
 {
-    instruction.instruction = next_instruction.instruction;
-    next_instruction.instruction = cp0->virtual_read32(pc);
+    instruction.instruction = cp0->virtual_read32(pc);
+    pc = next_pc;
+    next_pc += 4;
+
+    delay_slot = is_branch;
+    is_branch = false;
 
     std::uint32_t opcode = instruction.instruction >> 26;
     std::printf("(0x%08x): 0x%08x\n", pc - 4, instruction.instruction);
-    pc += 4;
 
     if(opcode == 0)
     {

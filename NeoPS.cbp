@@ -12,9 +12,13 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-m64" />
 					<Add option="-g" />
 					<Add directory="neops/include" />
 				</Compiler>
+				<Linker>
+					<Add option="-m64" />
+				</Linker>
 			</Target>
 			<Target title="Release i686">
 				<Option output="bin/Release/i686/NeoPS" prefix_auto="1" extension_auto="1" />
@@ -44,16 +48,18 @@
 			<Add option="-m32" />
 		</Linker>
 		<Unit filename="neops/include/bios/bios.hpp" />
-		<Unit filename="neops/include/bus/psmem.hpp" />
+		<Unit filename="neops/include/bus/bus.hpp" />
 		<Unit filename="neops/include/cpu/cop0.hpp" />
 		<Unit filename="neops/include/cpu/r3000a.hpp" />
 		<Unit filename="neops/include/instruction.hpp" />
 		<Unit filename="neops/include/register.hpp" />
+		<Unit filename="neops/include/spu/spu.hpp" />
 		<Unit filename="neops/source/bios/bios.cpp" />
-		<Unit filename="neops/source/bus/psmem.cpp" />
+		<Unit filename="neops/source/bus/bus.cpp" />
 		<Unit filename="neops/source/cpu/cop0.cpp" />
 		<Unit filename="neops/source/cpu/r3000a.cpp" />
 		<Unit filename="neops/source/main.cpp" />
+		<Unit filename="neops/source/spu/spu.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
