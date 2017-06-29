@@ -1,33 +1,33 @@
 # depslib dependency file v1.0
-1498390754 source:e:\users\jesse\documents\emu\neops\neops\source\main.cpp
+1498722562 source:e:\users\jesse\documents\emu\neops\neops\source\main.cpp
 	<iostream>
-	"bus/psmem.hpp"
+	"bus/bus.hpp"
 	"bios/bios.hpp"
 	"cpu/r3000a.hpp"
 
-1498480660 source:e:\users\jesse\documents\emu\neops\neops\source\cpu\cop0.cpp
+1498732874 source:e:\users\jesse\documents\emu\neops\neops\source\cpu\cop0.cpp
 	<cstdio>
 	<cstdlib>
 	"cpu/cop0.hpp"
-	"bus/psmem.hpp"
+	"bus/bus.hpp"
 	"register.hpp"
 
-1498395322 e:\users\jesse\documents\emu\neops\neops\include\cpu\cop0.hpp
+1498722562 e:\users\jesse\documents\emu\neops\neops\include\cpu\cop0.hpp
 	<cstdint>
 
-1498482823 source:e:\users\jesse\documents\emu\neops\neops\source\cpu\r3000a.cpp
+1498740554 source:e:\users\jesse\documents\emu\neops\neops\source\cpu\r3000a.cpp
 	<cstdio>
 	<cstdlib>
 	<cstring>
 	"cpu/r3000a.hpp"
 	"register.hpp"
 
-1498471385 e:\users\jesse\documents\emu\neops\neops\include\cpu\r3000a.hpp
+1498740388 e:\users\jesse\documents\emu\neops\neops\include\cpu\r3000a.hpp
 	<cstdint>
 	"cpu/cop0.hpp"
 	"instruction.hpp"
 
-1498396003 e:\users\jesse\documents\emu\neops\neops\include\register.hpp
+1498722562 e:\users\jesse\documents\emu\neops\neops\include\register.hpp
 
 1498583243 source:c:\users\quaker\documents\mosaic software\neops\neops\source\cpu\r3000a.cpp
 	<cstdio>
@@ -77,7 +77,7 @@
 1498294731 e:\users\jesse\documents\emu\neops\neops\include\bios.hpp
 	<string>
 
-1498205152 e:\users\jesse\documents\emu\neops\neops\include\instruction.hpp
+1498722562 e:\users\jesse\documents\emu\neops\neops\include\instruction.hpp
 	<cstdint>
 
 1498235871 source:c:\users\quaker\documents\mosaic software\neops\neops\source\bios.cpp
@@ -101,13 +101,13 @@
 1498489668 c:\users\quaker\documents\mosaic software\neops\neops\include\instruction.hpp
 	<cstdint>
 
-1498390333 source:e:\users\jesse\documents\emu\neops\neops\source\bios\bios.cpp
+1498722562 source:e:\users\jesse\documents\emu\neops\neops\source\bios\bios.cpp
 	"bios/bios.hpp"
 	<fstream>
 	<cassert>
 	<cstdio>
 
-1498390833 e:\users\jesse\documents\emu\neops\neops\include\bios\bios.hpp
+1498722562 e:\users\jesse\documents\emu\neops\neops\include\bios\bios.hpp
 	<string>
 
 1498489668 source:c:\users\quaker\documents\mosaic software\neops\neops\source\bios\bios.cpp
@@ -135,4 +135,21 @@
 
 1498489668 c:\users\quaker\documents\mosaic software\neops\neops\include\bus\bus.hpp
 	<cstdint>
+
+1498722562 e:\users\jesse\documents\emu\neops\neops\include\bus\bus.hpp
+	<cstdint>
+
+1498722562 source:e:\users\jesse\documents\emu\neops\neops\source\spu\spu.cpp
+	<cstdio>
+	"spu/spu.hpp"
+
+1498722562 e:\users\jesse\documents\emu\neops\neops\include\spu\spu.hpp
+	<cstdint>
+
+1498732802 source:e:\users\jesse\documents\emu\neops\neops\source\bus\bus.cpp
+	<cassert>
+	<cstring>
+	"bus/bus.hpp"
+	"bios/bios.hpp"
+	"spu/spu.hpp"
 

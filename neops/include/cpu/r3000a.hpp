@@ -94,10 +94,8 @@ namespace cpu
         operation_t ops_special[64];
 
         // INSTRUCTIONS
-        void op_add();
         void op_addi();
         void op_addiu();
-        void op_and();
         void op_andi();
         void op_beq();
         void op_bgez();
@@ -115,6 +113,7 @@ namespace cpu
 
         void op_j();
         void op_jal();
+        void op_lb();
         void op_lui();
         void op_lw();
         void op_ori();
@@ -123,7 +122,10 @@ namespace cpu
         void op_sw();
 
         // SPECIAL INSTRUCTIONS
+        void op_add();
         void op_addu();
+        void op_and();
+        void op_jr();
         void op_or();
         void op_sll();
         void op_sltu();

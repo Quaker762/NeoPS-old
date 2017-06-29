@@ -69,7 +69,10 @@ void cop0::write_gpr(unsigned reg, std::uint32_t val)
 
 void cop0::virtual_write8(std::uint32_t vaddr, std::uint8_t value)
 {
-    mem::write_byte(vaddr, value);
+    int segment = vaddr >> 29;
+    std::uint32_t phys_addr = vaddr & address_masks[segment];
+
+    mem::write_byte(phys_addr, value);
 }
 
 void cop0::virtual_write16(std::uint32_t vaddr, std::uint16_t value)
@@ -106,12 +109,6 @@ void cop0::virtual_write32(std::uint32_t vaddr, std::uint32_t value)
 // TODO: Caching???
 std::uint8_t cop0::virtual_read8(std::uint32_t vaddr)
 {
-    if(!align_check(vaddr))
-    {
-        std::printf("fatal: attempt to read from unalined memory address: 0x%08x (SIGBUS)\n", vaddr);
-        exit(-1);
-    }
-
     int segment = vaddr >> 29;
     std::uint32_t phys_addr = vaddr & address_masks[segment];
 

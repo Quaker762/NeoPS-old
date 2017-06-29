@@ -51,8 +51,14 @@ void mem::write_creg(std::uint32_t reg, std::uint32_t val)
 
 void mem::write_byte(std::uint32_t addr, std::uint8_t val)
 {
-    std::printf("warning: attempt to write to physical address 0x%08x with val 0x%02x\n", addr, val);
-    exit(-1);
+    if(addr >= 0x1f802000 && addr <= 0x1f802042)
+    {
+        std::printf("Attempt to write to Expansion2! 0x%08x:0x%08x\n", addr, val);
+        return;
+    }
+
+    std::printf("Attempt to write address 0x%08x with value 0x%08x", addr, val);
+    kuseg[addr] = val;
 }
 
 void mem::write_hword(std::uint32_t addr, std::uint16_t val)
@@ -104,7 +110,19 @@ std::uint8_t mem::read_byte(std::uint32_t addr)
     if(addr >= PSX_BIOS_SEGMENT_PHYS && addr <= PSX_BIOS_SEGMENT_PHYS + PSX_BIOS_SIZE)
         return bios::read_byte(addr - PSX_BIOS_SEGMENT_PHYS);
 
-    std::printf("fatal: invalid read8 of physical address: 0x%08x\n", addr);
+    if(addr >= 0x1f802000 && addr <= 0x1f802042)
+    {
+        std::printf("Attempt to read Expansion2! 0x%08x\n", addr);
+        return 0xFF;
+    }
+
+    if(addr >= 0x1f000080 && addr <= 0x1f000084)
+    {
+        std::printf("Attempt to read Expansion1! 0x%08x\n", addr);
+        return 0xFF;
+    }
+
+    return 0x00;
 }
 
 std::uint16_t mem::read_hword(std::uint32_t addr)

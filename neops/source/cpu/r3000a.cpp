@@ -81,23 +81,6 @@ void r3000a::op_addiu()
 }
 
 /**
- *  Bitwise AND
- *
- *  Format: AND rd, rs, rt.
- *  The contents of general register rs are combined with the contents of general register rt in a bit-wise logical AND operation.
- *  The result is placed into general register rd.
- *  @exception None
- */
-void r3000a::op_and()
-{
-    int rs = instruction.r_type.rs;
-    int rt = instruction.r_type.rt;
-    int rd = instruction.r_type.rd;
-
-    write_gpr(rd, gpr[rs] & gpr[rt]);
-}
-
-/**
  *  Immediate Bitwise AND
  *
  *  Format: AND rd, rs, rt.
@@ -112,6 +95,21 @@ void r3000a::op_andi()
     int rt = instruction.i_type.rt;
 
     write_gpr(rt, gpr[rs] & imm);
+}
+
+void r3000a::op_beq()
+{
+    std::int16_t target = (std::int16_t)(instruction.i_type.imm << 2);
+    int rs = instruction.i_type.rs;
+    int rt = instruction.i_type.rt;
+
+    if(gpr[rs] == gpr[rt])
+    {
+        std::printf("beq: gpr[rs] == gpr[rt]! setting pc to: 0x%08x\n", pc + target - 4);
+        next_pc += target;
+        next_pc -= 4;
+        is_branch = true;
+    }
 }
 
 void r3000a::op_bne()
@@ -150,19 +148,28 @@ void r3000a::op_j()
 
     next_pc = (pc & 0xf0000000) | (addr << 2);
     is_branch = true;
-    std::printf("warning: jump called with address 0x%08x! Next instruction at 0x%08x\n", addr << 2, pc);
+    std::printf("warning: jump called with address 0x%08x! Next instruction at 0x%08x\n", addr << 2, next_pc);
 }
 
 void r3000a::op_jal()
 {
     std::uint32_t addr = instruction.j_type.target;
 
+    write_gpr(31, next_pc);
+    std::printf("warning: jump called with address 0x%08x! Next instruction at 0x%08x\n", addr << 2, next_pc);
     next_pc = (pc & 0xf0000000) | (addr << 2);
-    write_gpr(31, pc + 8);
     is_branch = true;
-    std::printf("warning: jump called with address 0x%08x! Next instruction at 0x%08x\n", addr << 2, pc);
 }
 
+void r3000a::op_lb()
+{
+    std::uint32_t base = instruction.i_type.rs;
+    int rt = instruction.i_type.rt;
+    std::uint16_t offset = (std::int16_t)instruction.i_type.imm;
+
+    std::uint32_t vaddr = offset + gpr[base];
+    write_gpr(rt, cp0->virtual_read8(vaddr));
+}
 
 void r3000a::op_lui()
 {
@@ -176,10 +183,10 @@ void r3000a::op_lw()
 {
     std::uint32_t base = instruction.i_type.rs;
     int rt = instruction.i_type.rt;
-    std::int16_t offset = (std::int16_t)instruction.i_type.imm;
+    std::uint16_t offset = (std::int16_t)instruction.i_type.imm;
 
     std::uint32_t vaddr = offset + gpr[base];
-    gpr[rt] = cp0->virtual_read32(vaddr);
+    write_gpr(rt, cp0->virtual_read32(vaddr));
 }
 
 void r3000a::op_ori()
@@ -223,6 +230,28 @@ void r3000a::op_sw()
 
 // SPECIAL OPERATIONS
 
+void r3000a::op_add()
+{
+    int rs = instruction.r_type.rs;
+    int rt = instruction.r_type.rt;
+    int rd = instruction.r_type.rd;
+
+    std::int32_t rs_val = (std::int32_t)gpr[rs];
+    std::int32_t rt_val = (std::int32_t)gpr[rt];
+    std::uint32_t val = (std::int32_t)rs_val + (std::int32_t)rt_val;
+
+    if(overflow(rs_val, rt_val, val))
+    {
+        cp0->trigger_exception(cop0::ARITHMETIC_OVERFLOW);
+        std::printf("fatal: ADDI overflow!\n");
+        exit(-1);
+        return; // Addition does NOT occur!
+    }
+
+    write_gpr(rd, val);
+
+}
+
 void r3000a::op_addu()
 {
     int rs = instruction.r_type.rs;
@@ -230,6 +259,24 @@ void r3000a::op_addu()
     int rd = instruction.r_type.rd;
 
     write_gpr(rd, gpr[rs] + gpr[rt]);
+}
+
+void r3000a::op_and()
+{
+    int rs = instruction.r_type.rs;
+    int rt = instruction.r_type.rt;
+    int rd = instruction.r_type.rd;
+
+    write_gpr(rd, gpr[rs] & gpr[rt]);
+}
+
+void r3000a::op_jr()
+{
+    int rs = instruction.r_type.rs;
+
+    std::printf("jr: Attempting to jump to 0x%08x!\n", gpr[rs]);
+    next_pc = gpr[rs];
+    is_branch = true;
 }
 
 void r3000a::op_or()
@@ -277,6 +324,7 @@ r3000a::r3000a()
     // Fill instruction jump table
     ops_normal[0x02] = &op_j;
     ops_normal[0x03] = &op_jal;
+    ops_normal[0x04] = &op_beq;
     ops_normal[0x05] = &op_bne;
     ops_normal[0x08] = &op_addi;
     ops_normal[0x09] = &op_addiu;
@@ -284,6 +332,7 @@ r3000a::r3000a()
     ops_normal[0x0d] = &op_ori;
     ops_normal[0x0f] = &op_lui;
     ops_normal[0x10] = &op_ctc0;
+    ops_normal[0x20] = &op_lb;
     ops_normal[0x23] = &op_lw;
     ops_normal[0x28] = &op_sb;
     ops_normal[0x29] = &op_sh;
@@ -291,7 +340,10 @@ r3000a::r3000a()
 
 
     ops_special[0x00] = &op_sll;
+    ops_special[0x08] = &op_jr;
+    ops_special[0x20] = &op_add;
     ops_special[0x21] = &op_addu;
+    ops_special[0x24] = &op_and;
     ops_special[0x25] = &op_or;
     ops_special[0x2b] = &op_sltu;
 
