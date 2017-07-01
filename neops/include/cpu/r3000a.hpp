@@ -86,9 +86,12 @@ namespace cpu
         std::uint64_t   lo;                     /**< Multiplication 64 bit low result or division quotient. */
         std::uint32_t   pc;                     /**< Program Counter. */
         std::uint32_t   next_pc;                /**< Instruction next PC (of next instruction)*/
+        std::uint32_t   load_delay;             /**< Load delay value. */
+        std::uint32_t   delay_reg;              /**< Our delay register we want to write to. */
         bool            is_branch;              /**< Has a branch occurred? */
         bool            delay_slot;             /**< Are we in a branch delay?? */
         instruction_t   instruction;            /**< Current instruction. */
+        instruction_t   next_instruction;       /**< Next instruction to execute */
 
         operation_t ops_normal[64];
         operation_t ops_special[64];
@@ -97,6 +100,7 @@ namespace cpu
         void op_addi();
         void op_addiu();
         void op_andi();
+        void op_bcondz();
         void op_beq();
         void op_bgez();
         void op_bgezal();
@@ -106,20 +110,21 @@ namespace cpu
         void op_bltzal();
         void op_bne();
         void op_brk();
-        void op_ctc0();
-        void op_ctc1();
-        void op_ctc2();
-        void op_ctc3();
 
         void op_j();
         void op_jal();
+        void op_jalr();
         void op_lb();
+        void op_lbu();
         void op_lui();
         void op_lw();
+        void op_mxc0();
         void op_ori();
         void op_sb();
         void op_sh();
+        void op_slti();
         void op_sw();
+
 
         // SPECIAL INSTRUCTIONS
         void op_add();

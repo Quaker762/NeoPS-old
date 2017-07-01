@@ -51,19 +51,20 @@ void mem::write_creg(std::uint32_t reg, std::uint32_t val)
 
 void mem::write_byte(std::uint32_t addr, std::uint8_t val)
 {
+    std::printf("write_byte: attempt to write to physical address 0x%08x with val 0x%02x\n", addr, val);
+
     if(addr >= 0x1f802000 && addr <= 0x1f802042)
     {
         std::printf("Attempt to write to Expansion2! 0x%08x:0x%08x\n", addr, val);
         return;
     }
 
-    std::printf("Attempt to write address 0x%08x with value 0x%08x", addr, val);
     kuseg[addr] = val;
 }
 
 void mem::write_hword(std::uint32_t addr, std::uint16_t val)
 {
-    std::printf("warning: attempt to write to physical address 0x%08x with val 0x%04x\n", addr, val);
+    std::printf("write_hword: attempt to write to physical address 0x%08x with val 0x%04x\n", addr, val);
 
     if(addr >= PSX_SPU_CREG_START && addr <= PSX_SPU_CREG_END)
     {
@@ -73,17 +74,23 @@ void mem::write_hword(std::uint32_t addr, std::uint16_t val)
 
     kuseg[addr + 0] = val & 0xff;
     kuseg[addr + 1] = (val >> 8) & 0xff;
-    exit(-1);
 }
 
 void mem::write_word(std::uint32_t addr, std::uint32_t val)
 {
+    std::printf("write_word: attempt to write to physical address 0x%08x with val 0x%08x\n", addr, val);
+
+    if(addr == 0x1f801074 || addr == 0x1f801070)
+    {
+        std::printf("warning: attempt to write IRQ register!\n");
+        return;
+    }
+
     if(addr >= PSX_MEM_CONTROL_BASE && addr <= PSX_MEM_CONTROL_END)
     {
         write_creg(addr, val);
         return;
     }
-
 
     if(addr == PSX_MEM_RAM_SIZE_REG)
     {
@@ -96,8 +103,6 @@ void mem::write_word(std::uint32_t addr, std::uint32_t val)
         std::printf("warning: attempt to write cache control with value: 0x%08x!\n", val);
         return;
     }
-
-    std::printf("warning: attempt to write to physical address 0x%08x with val 0x%08x\n", addr, val);
 
     kuseg[addr + 0] = val & 0xff;
     kuseg[addr + 1] = (val >> 8) & 0xff;
@@ -122,7 +127,7 @@ std::uint8_t mem::read_byte(std::uint32_t addr)
         return 0xFF;
     }
 
-    return 0x00;
+    return kuseg[addr];
 }
 
 std::uint16_t mem::read_hword(std::uint32_t addr)
@@ -130,7 +135,7 @@ std::uint16_t mem::read_hword(std::uint32_t addr)
     if(addr >= PSX_BIOS_SEGMENT_PHYS && addr < PSX_BIOS_SEGMENT_PHYS + PSX_BIOS_SIZE)
         return bios::read_hword(addr - PSX_BIOS_SEGMENT_PHYS);
 
-    std::printf("fatal: invalid read16 of physical address: 0x%08x\n", addr);
+    return kuseg[addr] | (kuseg[addr + 1] << 8);
 }
 
 std::uint32_t mem::read_word(std::uint32_t addr)

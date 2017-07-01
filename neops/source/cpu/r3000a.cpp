@@ -97,6 +97,60 @@ void r3000a::op_andi()
     write_gpr(rt, gpr[rs] & imm);
 }
 
+void r3000a::op_bgtz()
+{
+    std::int16_t target = (std::int16_t)(instruction.i_type.imm << 2);
+    int rs = instruction.i_type.rs;
+
+    if(gpr[rs] != 0 && (gpr[rs] & 0x80000000) == 0)
+    {
+        std::printf("bgtz: gpr[rs] != 0 && (gpr[rs] & 0x80000000) == 0! setting pc to: 0x%08x\n", pc + target - 4);
+        next_pc += target;
+        next_pc -= 4;
+        is_branch = true;
+    }
+}
+
+void r3000a::op_blez()
+{
+    std::int16_t target = (std::int16_t)(instruction.i_type.imm << 2);
+    int rs = instruction.i_type.rs;
+
+    if(gpr[rs] == 0 && gpr[rs] & 0x80000000)
+    {
+        std::printf("blez: gpr[rs] != 0 && (gpr[rs] & 0x80000000) == 0! setting pc to: 0x%08x\n", pc + target - 4);
+        next_pc += target;
+        next_pc -= 4;
+        is_branch = true;
+    }
+}
+
+void r3000a::op_bcondz()
+{
+    int rs = instruction.i_type.rs;
+    std::uint32_t is_bgez = (instruction.instruction >> 16) & 1;
+    std::uint32_t is_link = ((instruction.instruction >> 17) & 0xf) == 8;
+    std::int32_t val = (std::int32_t)gpr[rs];
+
+    std::uint32_t test = (val < 0);
+
+    test = test ^ is_bgez;
+
+    if(is_link)
+    {
+        write_gpr(31, next_pc);
+    }
+
+    if(test != 0)
+    {
+        std::int16_t target = (std::int16_t)(instruction.i_type.imm << 2);
+        std::printf("bcondz: branching to: 0x%08x\n", pc + target - 4);
+        next_pc += target;
+        next_pc -= 4;
+        is_branch = true;
+    }
+}
+
 void r3000a::op_beq()
 {
     std::int16_t target = (std::int16_t)(instruction.i_type.imm << 2);
@@ -123,9 +177,8 @@ void r3000a::op_bne()
         std::printf("bne: gpr[rs] != gpr[rt]! setting pc to: 0x%08x\n", pc + target - 4);
         next_pc += target;
         next_pc -= 4;
+        is_branch = true;
     }
-
-    is_branch = true;
 }
 
 void r3000a::op_brk()
@@ -133,7 +186,7 @@ void r3000a::op_brk()
     cp0->trigger_exception(cop0::BREAKPOINT);
 }
 
-void r3000a::op_ctc0()
+void r3000a::op_mxc0()
 {
     int rt = instruction.r_type.rt;
     int rd = instruction.r_type.rd;
@@ -148,7 +201,7 @@ void r3000a::op_j()
 
     next_pc = (pc & 0xf0000000) | (addr << 2);
     is_branch = true;
-    std::printf("warning: jump called with address 0x%08x! Next instruction at 0x%08x\n", addr << 2, next_pc);
+    std::printf("j: jump called with address 0x%08x! Next instruction at 0x%08x\n", addr << 2, next_pc);
 }
 
 void r3000a::op_jal()
@@ -156,19 +209,45 @@ void r3000a::op_jal()
     std::uint32_t addr = instruction.j_type.target;
 
     write_gpr(31, next_pc);
-    std::printf("warning: jump called with address 0x%08x! Next instruction at 0x%08x\n", addr << 2, next_pc);
+    std::printf("jal: jump called with address 0x%08x! Next instruction at 0x%08x\n", addr << 2, next_pc);
     next_pc = (pc & 0xf0000000) | (addr << 2);
     is_branch = true;
 }
 
 void r3000a::op_lb()
 {
+    if(cp0->read_gpr(0x0c) & 0x00010000)
+    {
+        std::printf("sw: ignoring read from cache!\n");
+        return;
+    }
+
     std::uint32_t base = instruction.i_type.rs;
     int rt = instruction.i_type.rt;
     std::uint16_t offset = (std::int16_t)instruction.i_type.imm;
 
     std::uint32_t vaddr = offset + gpr[base];
-    write_gpr(rt, cp0->virtual_read8(vaddr));
+    std::uint8_t val = (std::int8_t)cp0->virtual_read8(vaddr);
+    write_gpr(rt, (std::uint32_t)val);
+//    load_delay = val;
+//    delay_reg = rt;
+}
+
+void r3000a::op_lbu()
+{
+    if(cp0->read_gpr(0x0c) & 0x00010000)
+    {
+        std::printf("sw: ignoring read from cache!\n");
+        return;
+    }
+
+    std::uint32_t base = instruction.i_type.rs;
+    int rt = instruction.i_type.rt;
+    std::uint16_t offset = (std::int16_t)instruction.i_type.imm;
+
+    std::uint32_t vaddr = offset + gpr[base];
+    std::uint8_t val = (std::uint32_t)cp0->virtual_read8(vaddr);
+    write_gpr(rt, val);
 }
 
 void r3000a::op_lui()
@@ -181,12 +260,21 @@ void r3000a::op_lui()
 
 void r3000a::op_lw()
 {
+    if(cp0->read_gpr(0x0c) & 0x00010000)
+    {
+        std::printf("lw: Ignoring read from cache!\n");
+        return;
+    }
+
     std::uint32_t base = instruction.i_type.rs;
     int rt = instruction.i_type.rt;
-    std::uint16_t offset = (std::int16_t)instruction.i_type.imm;
+    std::uint32_t offset = (std::int16_t)instruction.i_type.imm;
 
     std::uint32_t vaddr = offset + gpr[base];
-    write_gpr(rt, cp0->virtual_read32(vaddr));
+    std::uint32_t val = cp0->virtual_read32(vaddr);
+    write_gpr(rt, val);
+//    load_delay = val;
+//    delay_reg = rt;
 }
 
 void r3000a::op_ori()
@@ -200,31 +288,62 @@ void r3000a::op_ori()
 
 void r3000a::op_sh()
 {
+    if(cp0->read_gpr(0x0c) & 0x00010000)
+    {
+        std::printf("sw: ignoring read from cache!\n");
+        return;
+    }
+
     std::uint32_t base = instruction.i_type.rs;
     std::uint32_t rt = instruction.i_type.rt;
     std::uint32_t offset = (std::int16_t)(instruction.i_type.imm);
 
-    std::uint32_t vaddr = (std::int32_t)(gpr[base] + offset);
+    std::uint32_t vaddr = gpr[base] + offset;
     cp0->virtual_write16(vaddr, gpr[rt]);
+}
+
+void r3000a::op_slti()
+{
+    std::int32_t imm = (std::int16_t)instruction.i_type.imm;
+    int rs = instruction.i_type.rs;
+    int rt = instruction.i_type.rt;
+    std::int32_t val = gpr[rs];
+
+    if(val < imm)
+        write_gpr(rt, 0x00000001);
+    else
+        write_gpr(rt, 0x00000000);
 }
 
 void r3000a::op_sb()
 {
+    if(cp0->read_gpr(0x0c) & 0x00010000)
+    {
+        std::printf("sw: ignoring read from cache!\n");
+        return;
+    }
+
     std::uint32_t base = instruction.i_type.rs;
     std::uint32_t rt = instruction.i_type.rt;
     std::uint32_t offset = (std::int16_t)(instruction.i_type.imm);
 
-    std::uint32_t vaddr = (std::int32_t)(gpr[base] + offset);
+    std::uint32_t vaddr = gpr[base] + offset;
     cp0->virtual_write8(vaddr, gpr[rt]);
 }
 
 void r3000a::op_sw()
 {
+    if(cp0->read_gpr(0x0c) & 0x00010000)
+    {
+        std::printf("sw: ignoring read from cache!\n");
+        return;
+    }
+
     std::uint32_t base = instruction.i_type.rs;
     std::uint32_t rt = instruction.i_type.rt;
     std::uint32_t offset = (std::int16_t)(instruction.i_type.imm);
 
-    std::uint32_t vaddr = (std::int32_t)(gpr[base] + offset);
+    std::uint32_t vaddr = gpr[base] + offset;
     cp0->virtual_write32(vaddr, gpr[rt]);
 }
 
@@ -244,12 +363,10 @@ void r3000a::op_add()
     {
         cp0->trigger_exception(cop0::ARITHMETIC_OVERFLOW);
         std::printf("fatal: ADDI overflow!\n");
-        exit(-1);
         return; // Addition does NOT occur!
     }
 
     write_gpr(rd, val);
-
 }
 
 void r3000a::op_addu()
@@ -267,7 +384,18 @@ void r3000a::op_and()
     int rt = instruction.r_type.rt;
     int rd = instruction.r_type.rd;
 
-    write_gpr(rd, gpr[rs] & gpr[rt]);
+    std::uint32_t val = gpr[rs] & gpr[rt];
+    write_gpr(rd, val);
+}
+
+void r3000a::op_jalr()
+{
+    int rs = instruction.r_type.rs;
+
+    write_gpr(31, next_pc);
+    std::printf("jalr: Attempting to jump to 0x%08x! Return address: 0x%08x\n", gpr[rs], next_pc);
+    next_pc = gpr[rs];
+    is_branch = true;
 }
 
 void r3000a::op_jr()
@@ -322,18 +450,22 @@ r3000a::r3000a()
     }
 
     // Fill instruction jump table
+    ops_normal[0x01] = &op_bcondz;
     ops_normal[0x02] = &op_j;
     ops_normal[0x03] = &op_jal;
     ops_normal[0x04] = &op_beq;
     ops_normal[0x05] = &op_bne;
+    ops_normal[0x06] = &op_blez;
+    ops_normal[0x07] = &op_bgtz;
     ops_normal[0x08] = &op_addi;
     ops_normal[0x09] = &op_addiu;
     ops_normal[0x0c] = &op_andi;
     ops_normal[0x0d] = &op_ori;
     ops_normal[0x0f] = &op_lui;
-    ops_normal[0x10] = &op_ctc0;
+    ops_normal[0x10] = &op_mxc0;
     ops_normal[0x20] = &op_lb;
     ops_normal[0x23] = &op_lw;
+    ops_normal[0x24] = &op_lbu;
     ops_normal[0x28] = &op_sb;
     ops_normal[0x29] = &op_sh;
     ops_normal[0x2b] = &op_sw;
@@ -341,6 +473,7 @@ r3000a::r3000a()
 
     ops_special[0x00] = &op_sll;
     ops_special[0x08] = &op_jr;
+    ops_special[0x09] = &op_jalr;
     ops_special[0x20] = &op_add;
     ops_special[0x21] = &op_addu;
     ops_special[0x24] = &op_and;
@@ -375,6 +508,7 @@ std::uint32_t r3000a::read_gpr(unsigned reg) const
 void r3000a::write_gpr(unsigned reg, std::uint32_t value)
 {
     gpr_delay[reg] = value;
+    gpr[0] = 0x00000000;
 }
 
 void r3000a::cycle()
@@ -385,6 +519,13 @@ void r3000a::cycle()
 
     delay_slot = is_branch;
     is_branch = false;
+
+//    if(load_delay != 0)
+//    {
+//        write_gpr(delay_reg, load_delay);
+//        load_delay = 0;
+//        delay_reg = 0;
+//    }
 
     std::uint32_t opcode = instruction.instruction >> 26;
     std::printf("(0x%08x): 0x%08x\n", pc - 4, instruction.instruction);

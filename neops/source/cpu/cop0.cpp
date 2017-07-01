@@ -67,6 +67,11 @@ void cop0::write_gpr(unsigned reg, std::uint32_t val)
     gpr[reg] = val;
 }
 
+std::uint32_t cop0::read_gpr(unsigned reg)
+{
+    return gpr[reg];
+}
+
 void cop0::virtual_write8(std::uint32_t vaddr, std::uint8_t value)
 {
     int segment = vaddr >> 29;
@@ -86,8 +91,6 @@ void cop0::virtual_write16(std::uint32_t vaddr, std::uint16_t value)
 
     int segment = vaddr >> 29;
     std::uint32_t phys_addr = vaddr & address_masks[segment];
-
-
     mem::write_hword(phys_addr, value);
 }
 
