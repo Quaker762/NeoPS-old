@@ -25,6 +25,8 @@
 
 namespace cpu
 {
+    class cop0;
+
     /**
      *  Our R3000A CPU. Some interesting quirks and facts:
      *      - No FPU!!!
@@ -76,6 +78,12 @@ namespace cpu
             return pc;
         }
 
+        void set_pc(std::uint32_t addr)
+        {
+            pc = addr;
+            next_pc = pc + 4;
+        }
+
     private:
         cop0*           cp0;                    /**< Our CPU's cp0. */
         //cop2*           co2;                  /**< Our CPU's cop2. */
@@ -84,6 +92,7 @@ namespace cpu
 
         std::uint64_t   hi;                     /**< Multiplication 64 bit high result or division  remainder. */
         std::uint64_t   lo;                     /**< Multiplication 64 bit low result or division quotient. */
+        std::uint32_t   epc;                    /**< Current PC value */
         std::uint32_t   pc;                     /**< Program Counter. */
         std::uint32_t   next_pc;                /**< Instruction next PC (of next instruction)*/
         std::uint32_t   load_delay;             /**< Load delay value. */
@@ -116,24 +125,62 @@ namespace cpu
         void op_jalr();
         void op_lb();
         void op_lbu();
+        void op_lh();
+        void op_lhu();
         void op_lui();
         void op_lw();
-        void op_mxc0();
+        void op_lwc0();
+        void op_lwc1();
+        void op_lwc2();
+        void op_lwc3();
+        void op_lwl();
+        void op_lwr();
+        void op_cop0();
+        void op_cop1();
+        void op_cop2();
+        void op_cop3();
         void op_ori();
         void op_sb();
         void op_sh();
+        void op_sltiu();
         void op_slti();
         void op_sw();
+        void op_swl();
+        void op_swr();
+        void op_swc0();
+        void op_swc1();
+        void op_swc2();
+        void op_swc3();
+        void op_xori();
 
 
         // SPECIAL INSTRUCTIONS
         void op_add();
         void op_addu();
         void op_and();
+        void op_break();
+        void op_div();
+        void op_divu();
         void op_jr();
+        void op_mfhi();
+        void op_mflo();
+        void op_mthi();
+        void op_mtlo();
+        void op_mult();
+        void op_multu();
+        void op_nor();
         void op_or();
         void op_sll();
+        void op_slt();
         void op_sltu();
+        void op_sllv();
+        void op_sra();
+        void op_srav();
+        void op_srl();
+        void op_srlv();
+        void op_subu();
+        void op_syscall();
+        void op_xor();
     };
 }
 

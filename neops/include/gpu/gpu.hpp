@@ -14,18 +14,24 @@
     You should have received a copy of the GNU General Public License
     along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 **/
-#include <cstdio>
+#ifndef GPU_HPP_INCLUDED
+#define GPU_HPP_INCLUDED
 
-#include "spu/spu.hpp"
+#define GPU_GP0_SEND            0x1f801810
+#define GPU_GP1_SEND            0x1f801814
+#define GPU_GPUREAD_RESPONSE    0x1f801810
+#define GPU_GPUREAD_STAT        0x1f801814
 
-static std::uint32_t spu_creg[PSX_SPU_NUM_CREG]; /**< Our SPU control registers */
-
-using namespace spu;
-
-void spu::write_creg(std::uint32_t reg, std::uint32_t val)
+namespace gpu
 {
-    std::uint32_t r_idx = reg - PSX_SPU_CREG_START;
-    //std::printf("info: writing 0x%08x to spu register %d\n", val, r_idx);
+    class gpu
+    {
+    public:
 
-    spu_creg[r_idx] = val;
+    private:
+        std::uint32_t gpustat;
+    };
+
 }
+
+#endif // GPU_HPP_INCLUDED

@@ -57,9 +57,44 @@ cop0::~cop0()
 
 }
 
-void cop0::trigger_exception(EXCEPTION_TYPE ex)
+void cop0::trigger_exception(EXCEPTION_TYPE ex, r3000a* cpu)
 {
+    std::printf("cop0: entering exception %d!\n", ex);
 
+    std::uint32_t status = gpr[12];
+    status = (status & 0x3f) | ((status << 2) & 0x3f);
+
+    std::uint32_t cause;
+    cause = (cause & ~0x7f) | ((ex << 2) & 0x7f);
+
+    std::uint32_t epc = cpu->get_pc() - 4;
+
+//    if (state->is_branch_delay_slot)
+//    {
+//      epc = state->regs.this_pc - 4;
+//      cause |= 0x80000000;
+//    }
+//    else
+//    {
+//      epc = state->regs.this_pc;
+//      cause &= ~0x80000000;
+//    }
+
+    gpr[12] = status;
+    gpr[13] = cause;
+    gpr[14] = epc;
+
+    std::uint32_t addr = (status & (1 << 22)) ? 0xbfc00180 : 0x80000080;
+    cpu->set_pc(addr);
+}
+
+void cop0::rfe()
+{
+    std::printf("cop0: rfe\n");
+    std::uint32_t sr = gpr[12];
+    sr = (sr & ~0xf) | ((sr >> 2) & 0xf);
+
+    gpr[12] = sr;
 }
 
 void cop0::write_gpr(unsigned reg, std::uint32_t val)
@@ -77,7 +112,7 @@ void cop0::virtual_write8(std::uint32_t vaddr, std::uint8_t value)
     int segment = vaddr >> 29;
     std::uint32_t phys_addr = vaddr & address_masks[segment];
 
-    mem::write_byte(phys_addr, value);
+    bus::write_byte(phys_addr, value);
 }
 
 void cop0::virtual_write16(std::uint32_t vaddr, std::uint16_t value)
@@ -91,7 +126,7 @@ void cop0::virtual_write16(std::uint32_t vaddr, std::uint16_t value)
 
     int segment = vaddr >> 29;
     std::uint32_t phys_addr = vaddr & address_masks[segment];
-    mem::write_hword(phys_addr, value);
+    bus::write_hword(phys_addr, value);
 }
 
 void cop0::virtual_write32(std::uint32_t vaddr, std::uint32_t value)
@@ -106,7 +141,7 @@ void cop0::virtual_write32(std::uint32_t vaddr, std::uint32_t value)
     int segment = vaddr >> 29;
     std::uint32_t phys_addr = vaddr & address_masks[segment];
 
-    mem::write_word(phys_addr, value);
+    bus::write_word(phys_addr, value);
 }
 
 // TODO: Caching???
@@ -115,7 +150,7 @@ std::uint8_t cop0::virtual_read8(std::uint32_t vaddr)
     int segment = vaddr >> 29;
     std::uint32_t phys_addr = vaddr & address_masks[segment];
 
-    return mem::read_byte(phys_addr);
+    return bus::read_byte(phys_addr);
 }
 
 // TODO: Caching???
@@ -130,7 +165,7 @@ std::uint16_t cop0::virtual_read16(std::uint32_t vaddr)
     int segment = vaddr >> 29;
     std::uint32_t phys_addr = vaddr & address_masks[segment];
 
-    return mem::read_hword(phys_addr);
+    return bus::read_hword(phys_addr);
 }
 
 // TODO: Caching???
@@ -145,5 +180,5 @@ std::uint32_t cop0::virtual_read32(std::uint32_t vaddr)
     int segment = vaddr >> 29;
     std::uint32_t phys_addr = vaddr & address_masks[segment];
 
-    return mem::read_word(phys_addr);
+    return bus::read_word(phys_addr);
 }

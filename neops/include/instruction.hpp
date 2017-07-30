@@ -50,6 +50,13 @@ typedef union
         std::uint16_t op : 6;
     } r_type;
 
+    struct cop
+    {
+        std::uint32_t func : 25;
+        std::uint16_t co : 1;
+        std::uint32_t cop_num : 6;
+    } cop;
+
     std::uint32_t instruction;
 } instruction_t;
 

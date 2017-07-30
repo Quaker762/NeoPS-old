@@ -25,6 +25,20 @@
 #define PSX_MEM_CONTROL_BASE    0x1f801000
 #define PSX_MEM_CONTROL_END     0x1f801020
 
+#define PSX_INTERRUPT_MASK_REG  0x1f801074
+
+#define PSX_TIMER_COUNTER_0     0x1f801100
+#define PSX_TIMER_COUNTER_1     0x1f801110
+#define PSX_TIMER_COUNTER_2     0x1f801120
+
+#define PSX_TIMER_MODE_0        0x1f801104
+#define PSX_TIMER_MODE_1        0x1f801114
+#define PSX_TIMER_MODE_2        0x1f801124
+
+#define PSX_TIMER_TARGET_0      0x1f801108
+#define PSX_TIMER_TARGET_1      0x1f801118
+#define PSX_TIMER_TARGET_2      0x1f801128
+
 #define PSX_MEM_RAM_SIZE_REG    0x1f801060
 #define PSX_CACHE_CTRL_REG      0xfffe0130
 
@@ -54,7 +68,7 @@
  *      BIOS (real mapped location on a PSX)
  *      0xbfc0_0000-0xbfc7_ffff BIOS (512K)
  */
-namespace mem
+namespace bus
 {
 
     /**

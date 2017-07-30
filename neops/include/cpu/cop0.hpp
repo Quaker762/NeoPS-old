@@ -18,12 +18,15 @@
 #define COP0_HPP_INCLUDED
 
 #include <cstdint>
+#include "cpu/r3000a.hpp"
 
 #define COP0_MAX_REGS 16
 #define COP0_MAX_TLB_ENTRIES 64
 
 namespace cpu
 {
+    class r3000a;
+
     /**
      *  Our R3000A's first co-processor. Performs various operations in relation to
      *  the system's memory management, system interrupt management (exceptions) and breakpoints.
@@ -89,7 +92,7 @@ namespace cpu
          */
         std::uint32_t read_gpr(unsigned reg);
 
-        void trigger_exception(EXCEPTION_TYPE ex);
+        void trigger_exception(EXCEPTION_TYPE ex, r3000a* cpu);
 
         /**
          *  Write a byte to memory given a virtual address.

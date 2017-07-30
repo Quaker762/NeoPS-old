@@ -12,12 +12,12 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-m64" />
+					<Add option="-m32" />
 					<Add option="-g" />
 					<Add directory="neops/include" />
 				</Compiler>
 				<Linker>
-					<Add option="-m64" />
+					<Add option="-m32" />
 				</Linker>
 			</Target>
 			<Target title="Release i686">
@@ -51,6 +51,8 @@
 		<Unit filename="neops/include/bus/bus.hpp" />
 		<Unit filename="neops/include/cpu/cop0.hpp" />
 		<Unit filename="neops/include/cpu/r3000a.hpp" />
+		<Unit filename="neops/include/dma/dma.hpp" />
+		<Unit filename="neops/include/gpu/gpu.hpp" />
 		<Unit filename="neops/include/instruction.hpp" />
 		<Unit filename="neops/include/register.hpp" />
 		<Unit filename="neops/include/spu/spu.hpp" />
@@ -58,6 +60,7 @@
 		<Unit filename="neops/source/bus/bus.cpp" />
 		<Unit filename="neops/source/cpu/cop0.cpp" />
 		<Unit filename="neops/source/cpu/r3000a.cpp" />
+		<Unit filename="neops/source/dma/dma.cpp" />
 		<Unit filename="neops/source/main.cpp" />
 		<Unit filename="neops/source/spu/spu.cpp" />
 		<Extensions>

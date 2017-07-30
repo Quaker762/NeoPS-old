@@ -6,7 +6,7 @@
 int main()
 {
     // INITILISATION FUNCTIONS
-    mem::psmem_init();
+    bus::psmem_init();
     bios::load_bios("bios/SCPH1001.bin");
     cpu::r3000a cpu;
 
